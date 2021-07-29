@@ -4,7 +4,7 @@ using System.Net;
 using System.Text;
 using Newtonsoft.Json;
 
-namespace Monitor
+namespace Monitor.Clients
 {
     public interface ISlackClient
     {

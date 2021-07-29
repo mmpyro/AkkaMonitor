@@ -1,6 +1,6 @@
 using System.Net.Http;
 
-namespace Monitor
+namespace Monitor.Clients
 {
     public interface IRequest
     {

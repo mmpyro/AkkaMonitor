@@ -1,3 +1,5 @@
+using Monitor.Clients;
+
 namespace Monitor.Factories
 {
     public interface ISlackClientFactory

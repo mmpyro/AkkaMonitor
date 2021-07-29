@@ -1,3 +1,5 @@
+using Monitor.Messages;
+
 namespace Monitor.Dtos
 {
     public class RequestParameters
@@ -13,6 +15,11 @@ namespace Monitor.Dtos
         {
             Url = url;
             ExpectedStatusCode = expectedStatusCode;
+        }
+
+        public static RequestParameters From(CreateHttpMonitorMessage message)
+        {
+            return new RequestParameters(message.Url, message.ExpectedStatusCode);
         }
     }
 }

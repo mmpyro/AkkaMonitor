@@ -1,3 +1,5 @@
+using Monitor.Messages;
+
 namespace Monitor.Dtos
 {
     public class SlackConfiguration
@@ -10,5 +12,10 @@ namespace Monitor.Dtos
 
         public string Url { get; private set; }
         public string Channel { get; private set; }
+
+        public static SlackConfiguration From(CreateSlackAlertMessage message)
+        {
+            return new SlackConfiguration(message.Url, message.Channel);
+        }
     }
 }

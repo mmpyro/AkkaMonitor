@@ -1,4 +1,5 @@
 using Akka.Actor;
+using Monitor.Clients;
 using Monitor.Dtos;
 using Monitor.Factories;
 using Monitor.Messages;

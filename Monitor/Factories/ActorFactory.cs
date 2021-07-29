@@ -1,13 +1,15 @@
+using System;
 using Akka.Actor;
 using Monitor.Actors;
 using Monitor.Dtos;
+using Monitor.Messages;
 
 namespace Monitor.Factories
 {
     public interface IActorFactory
     {
-        Props CreateHttpMonitorActor(RequestParameters requestParameters);
-        Props CreateSlackAlertActor(SlackConfiguration slackConfiguration);
+        Props CreateMonitorActor(CreateMonitorMessage message);
+        Props CreateAlertActor(CreateAlertMessage message);
     }
 
     public class ActorFactory : IActorFactory
@@ -21,14 +23,28 @@ namespace Monitor.Factories
             _requestFactory = requestFactory;
         }
 
-        public Props CreateHttpMonitorActor(RequestParameters requestParameters)
+        public Props CreateMonitorActor(CreateMonitorMessage message)
         {
-            return Akka.Actor.Props.Create(() => new HttpMonitorActor(requestParameters, _requestFactory.Create()));
+            switch(message)
+            {
+                case CreateHttpMonitorMessage:
+                    var m = message as CreateHttpMonitorMessage;
+                    return Akka.Actor.Props.Create(() => new HttpMonitorActor(RequestParameters.From(m), _requestFactory.Create()));
+                default:
+                    throw new ArgumentException($"Not supported message type: {message.GetType().Name}");
+            }
         }
 
-        public Props CreateSlackAlertActor(SlackConfiguration slackConfiguration)
+        public Props CreateAlertActor(CreateAlertMessage message)
         {
-            return Akka.Actor.Props.Create(() => new SlackAlertActor(slackConfiguration, _slackClientFactory));
+            switch(message)
+            {
+                case CreateSlackAlertMessage:
+                    var m = message as CreateSlackAlertMessage;
+                    return Akka.Actor.Props.Create(() => new SlackAlertActor(SlackConfiguration.From(m), _slackClientFactory));
+                default:
+                    throw new ArgumentException($"Not supported message type: {message.GetType().Name}");
+            }
         }
     }
 }
