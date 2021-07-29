@@ -3,7 +3,6 @@ using Akka.Actor;
 using Monitor.Clients;
 using Monitor.Dtos;
 using Monitor.Messages;
-
 namespace Monitor.Actors
 {
     public class HttpMonitorActor : ReceiveActor

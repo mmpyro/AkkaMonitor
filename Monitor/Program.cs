@@ -5,34 +5,41 @@ using Monitor.Messages;
 using Monitor.Factories;
 using System.Threading.Tasks;
 using System.Threading;
+using Microsoft.Extensions.Configuration;
+using System.Linq;
 
 namespace Monitor
 {
     class Program
     {
-        private const string SLACK_URL = "***REMOVED***";
-        private const string SLACK_CHANNEL = "#akka";
         private static CancellationTokenSource _cts = new CancellationTokenSource();
         private static CancellationToken _ct = _cts.Token;
 
+        private static IConfigurationRoot _configuration;
+
         static async Task Main(string[] args)
         {
-            const string url = "http://localhost:8081";
-            const int checkInterval = 5;
+            _configuration = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddEnvironmentVariables()
+                .Build();
+
+            var configurationParser = new ConfigurationParser(_configuration);
+
             using(var system = ActorSystem.Create("Monitor"))
             {
                 var actorFactory = new ActorFactory(new RequestFactory(), new SlackClientFactory());
                 var monitorManager = system.ActorOf(MonitorManagerActor.Props(actorFactory));
                 var alertManager = system.ActorOf(AlertManagerActor.Props(actorFactory), nameof(AlertManagerActor));
-                monitorManager.Tell(new CreateHttpMonitorMessage(url, 200));
-                alertManager.Tell(new CreateSlackAlertMessage(SLACK_URL, SLACK_CHANNEL));
+                configurationParser.Monitors.ToList().ForEach(m => monitorManager.Tell(m));
+                configurationParser.Alerts.ToList().ForEach(m => alertManager.Tell(m));
 
                 var scheduler = Task.Run(async () => {
                     _ct.ThrowIfCancellationRequested();
                     var now = DateTime.UtcNow;
                     while(!_ct.IsCancellationRequested)
                     {
-                        if((DateTime.UtcNow - now).Seconds > checkInterval)
+                        if((DateTime.UtcNow - now).Seconds > configurationParser.CheckInterval)
                         {
                             monitorManager.Tell(new TriggerMessage());
                             Console.WriteLine("Sending TriggerMessage");
