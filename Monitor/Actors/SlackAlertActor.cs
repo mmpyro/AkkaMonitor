@@ -17,6 +17,10 @@ namespace Monitor.Actors
             Receive<TriggerAlertMessage>(m => {
                 _slackClient.PostMessage(m.Content, SLACK_USER, configuration.Channel);
             });
+
+            Receive<TriggerAlertCancelationMessage>(m => {
+                _slackClient.PostMessage(m.Content, SLACK_USER, configuration.Channel);
+            });
         }
 
         public static Props Props(SlackConfiguration configuration, ISlackClientFactory slackClientFactory)

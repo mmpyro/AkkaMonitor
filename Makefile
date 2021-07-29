@@ -1,13 +1,17 @@
 monitor='./Monitor/Monitor.csproj'
 web='./Web'
 
-build_sln:
+build:
 	dotnet build
 
-restore_sln:
+restore:
 	dotnet restore
 
-build:
+rebuild:
+	dotnet clean
+	dotnet build
+
+build_monitor:
 	dotnet build $(monitor)
 
 run:

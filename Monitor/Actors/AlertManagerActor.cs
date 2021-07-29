@@ -26,6 +26,13 @@ namespace Monitor.Actors
                     actor.Tell(m);
                 }
             });
+
+            Receive<TriggerAlertCancelationMessage>(m => {
+                foreach(var actor in _actorsRef.Values)
+                {
+                    actor.Tell(m);
+                }
+            });
         }
 
         public static Props Props(IActorFactory actorFactory)

@@ -1,5 +1,8 @@
 ﻿using System;
+using System.IO;
+using System.Reflection;
 using Akka.Actor;
+using Akka.Configuration;
 using Monitor.Actors;
 using Monitor.Messages;
 using Monitor.Factories;
@@ -14,7 +17,6 @@ namespace Monitor
     {
         private static CancellationTokenSource _cts = new CancellationTokenSource();
         private static CancellationToken _ct = _cts.Token;
-
         private static IConfigurationRoot _configuration;
 
         static async Task Main(string[] args)
@@ -23,10 +25,9 @@ namespace Monitor
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .AddEnvironmentVariables()
                 .Build();
-
             var configurationParser = new ConfigurationParser(_configuration);
 
-            using(var system = ActorSystem.Create("Monitor"))
+            using(var system = ActorSystem.Create("Monitor", LoadActorSystemConfig()))
             {
                 var actorFactory = new ActorFactory(new RequestFactory(), new SlackClientFactory());
                 var monitorManager = system.ActorOf(MonitorManagerActor.Props(actorFactory));
@@ -54,6 +55,13 @@ namespace Monitor
                 _cts.Cancel();
                 await scheduler;
             }
+        }
+
+        private static Config LoadActorSystemConfig()
+        {
+            var executableLocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var configString = File.ReadAllText(Path.Combine(executableLocation, "actorsystem.conf"));
+            return ConfigurationFactory.ParseString(configString);
         }
     }
 }
