@@ -10,7 +10,7 @@ namespace Monitor
     public static class Container
     {
         private static IContainer _instance = null;
-        private static object _locker = new object();
+        private static readonly object _locker = new object();
         public static IContainer Instance
         {
             get
@@ -19,20 +19,23 @@ namespace Monitor
                 {
                     lock(_locker)
                     {
-                        var configuration = new ConfigurationBuilder()
-                        .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                        .AddEnvironmentVariables()
-                        .Build();
-                        
-                        var builder = new ContainerBuilder();
-                        builder.Register((c,p) => configuration).As<IConfigurationRoot>();
-                        builder.RegisterType<ConfigurationParser>().As<IConfigurationParser>();
-                        builder.RegisterType<RequestFactory>().As<IRequestFactory>();
-                        builder.RegisterType<SlackClientFactory>().As<ISlackClientFactory>();
-                        builder.RegisterType<ActorFactory>().As<IActorFactory>();
-                        builder.RegisterType<MonitorManagerActor>();
-                        builder.RegisterType<AlertManagerActor>();
-                        _instance = builder.Build();
+                        if(_instance == null)
+                        {
+                            var configuration = new ConfigurationBuilder()
+                            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                            .AddEnvironmentVariables()
+                            .Build();
+                            
+                            var builder = new ContainerBuilder();
+                            builder.Register((c,p) => configuration).As<IConfigurationRoot>();
+                            builder.RegisterType<ConfigurationParser>().As<IConfigurationParser>();
+                            builder.RegisterType<RequestFactory>().As<IRequestFactory>();
+                            builder.RegisterType<SlackClientFactory>().As<ISlackClientFactory>();
+                            builder.RegisterType<ActorFactory>().As<IActorFactory>();
+                            builder.RegisterType<MonitorManagerActor>();
+                            builder.RegisterType<AlertManagerActor>();
+                            _instance = builder.Build();
+                        }
                     }
                 }
                 return _instance;

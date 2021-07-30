@@ -22,9 +22,8 @@ namespace Monitor
                 configurationParser.Monitors.ToList().ForEach(m => monitorManager.Tell(m));
                 configurationParser.Alerts.ToList().ForEach(m => alertManager.Tell(m));
 
-                // Console.WriteLine("To finish press any key..");
-                // Console.ReadKey();
-                System.Threading.Thread.Sleep(TimeSpan.FromMinutes(20));
+                Console.WriteLine("To finish press any key..");
+                Console.ReadKey();
             }
         }
 
