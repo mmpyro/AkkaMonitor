@@ -34,10 +34,5 @@ namespace Monitor.Actors
                 }
             });
         }
-
-        public static Props Props(IActorFactory actorFactory)
-        {
-            return Akka.Actor.Props.Create(() => new AlertManagerActor(actorFactory));
-        }
     }
 }

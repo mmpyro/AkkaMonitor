@@ -13,7 +13,7 @@ namespace Monitor.Actors
         private readonly ILoggingAdapter _log = Logging.GetLogger(Context);
         private readonly int _checkInterval;
 
-        public MonitorManagerActor(IActorFactory actorFactory, int checkInterval)
+        public MonitorManagerActor(IActorFactory actorFactory, IConfigurationParser configuration)
         {
             Receive<CreateMonitorMessage>(m => {
                 if(!_actorsRef.ContainsKey(m.GetHashCode()))
@@ -31,15 +31,10 @@ namespace Monitor.Actors
                     actor.Tell(m);
                 }
             });
-            _checkInterval = checkInterval;
+            _checkInterval = configuration.CheckInterval;
         }
 
         public ITimerScheduler Timers {get; set;}
-
-        public static Props Props(IActorFactory actorFactory, int checkInterval)
-        {
-            return Akka.Actor.Props.Create(() => new MonitorManagerActor(actorFactory, checkInterval));
-        }
 
         protected override void PreStart()
         {
