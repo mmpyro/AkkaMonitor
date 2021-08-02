@@ -6,21 +6,21 @@ namespace Monitor.Messages
 
     public class InactiveActorMetricMessage {}
 
-    public class UpMonitorMetricMessage
+    public class MetricMessage
     {
         public string Name { get; set; }
-        public MonitorState State { get; set; }
         public MonitorType Type { get; set; }
         public string Identifier { get; set; }
-        public string[] Labels => new [] {Name, Type.ToString(), Identifier};
+        public virtual string[] Labels => new [] {Name, Type.ToString(), Identifier};
     }
 
-    public class MonitorLattencyMessage
+    public class UpMonitorMetricMessage : MetricMessage
     {
-        public string Name { get; set; }
+        public MonitorState State { get; set; }
+    }
+
+    public class MonitorLattencyMessage : MetricMessage
+    {
         public double Value { get; set; }
-        public MonitorType Type { get; set; }
-        public string Identifier { get; set; }
-        public string[] Labels => new [] {Name, Type.ToString(), Identifier};
     }
 }
