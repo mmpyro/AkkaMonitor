@@ -1,16 +1,18 @@
 using Akka.Actor;
-using Akka.Event;
 using Monitor.Clients;
 using Monitor.Dtos;
 using Monitor.Messages;
 using System.Threading.Tasks;
+using Monitor.Enums;
+
 namespace Monitor.Actors
 {
-    public class HttpMonitorActor : ReceiveActor
+    public class HttpMonitorActor : MonitorActor
     {
         private class SendAlertMessage
         {
             public string Content { get; set; }
+            public int? StatusCode { get; set; }
         }
 
         private class RevokeAlertMessage
@@ -18,42 +20,47 @@ namespace Monitor.Actors
             public int StatusCode { get; set; }
         }
 
-        private const string ALERT_MANAGER = "/user/AlertManagerActor";
-        private readonly ILoggingAdapter _log = Logging.GetLogger(Context);
         private readonly RequestParameters _parameters;
         private readonly IRequest _request;
-        public HttpMonitorActor(RequestParameters parameters, IRequest request)
+
+        
+        public HttpMonitorActor(RequestParameters parameters, IRequest request) : base(nameof(HttpMonitorActor), MonitorType.Http, parameters.Url)
         {
             _request = request;
             _parameters = parameters;
-
-            Become(Success);
         }
 
-        private void Success()
+        protected override void Success()
         {
-            _log.Info("Become Success");
+            base.Success();
 
             Receive<SendAlertMessage>(m => {
-                var selection = Context.System.ActorSelection(ALERT_MANAGER);
-                selection.Tell(new TriggerAlertMessage(m.Content));
-                _log.Info("Sending TriggerAlertMessage");
-                Become(Failed);
+                if(!m.StatusCode.HasValue || m.StatusCode != _parameters.ExpectedStatusCode)
+                {
+                    var selection = Context.System.ActorSelection(ALERT_MANAGER);
+                    selection.Tell(new TriggerAlertMessage(m.Content));
+                    Log.Info("Sending TriggerAlertMessage");
+                    Become(Failed);
+                }
+                else
+                    SendMonitorLattencyMessage();
             });
 
             Receive<TriggerMessage>(m =>
             {
+                StartMeasure();
                 _request.Get(_parameters.Url)
                         .ContinueWith(t => {
+                            StopMeasure();
                             if(t.IsFaulted)
                             {
                                 var ex = t.Exception;
                                 return new SendAlertMessage{ Content = $"Http request has finished with error {ex.Message}"};
                             }
-                            else if(t.IsCompletedSuccessfully && t.Result != _parameters.ExpectedStatusCode)
+                            else if(t.IsCompletedSuccessfully)
                             {
                                 var content = $"Http request has finished with {t.Result} status code when call {_parameters.Url}. Expected {_parameters.ExpectedStatusCode} status code.";
-                                return new SendAlertMessage{ Content = content};
+                                return new SendAlertMessage{ Content = content, StatusCode = t.Result};
                             }
                             return null;
                         }, TaskContinuationOptions.AttachedToParent & TaskContinuationOptions.ExecuteSynchronously)
@@ -61,23 +68,28 @@ namespace Monitor.Actors
             });
         }
 
-        private void Failed()
+        protected override void Failed()
         {
-            _log.Info("Become Failed");
-
+            base.Failed();
             Receive<RevokeAlertMessage>(m => {
-                var content = $"Http request has finished with {m.StatusCode} status code when call {_parameters.Url}.";
-                var selection = Context.System.ActorSelection(ALERT_MANAGER);
-                selection.Tell(new TriggerAlertCancelationMessage(content));
-                _log.Info("Sending TriggerAlertCancelationMessage");
-                Become(Success);
+                if(m.StatusCode == _parameters.ExpectedStatusCode)
+                {
+                    var content = $"Http request has finished with {m.StatusCode} status code when call {_parameters.Url}.";
+                    var selection = Context.System.ActorSelection(ALERT_MANAGER);
+                    selection.Tell(new TriggerAlertCancelationMessage(content));
+                    Log.Info("Sending TriggerAlertCancelationMessage");
+                    Become(Success);
+                }
+                SendMonitorLattencyMessage();
             });
 
             Receive<TriggerMessage>(m =>
             {
+                StartMeasure();
                 _request.Get(_parameters.Url)
                         .ContinueWith(t => {
-                                if(t.IsCompletedSuccessfully && t.Result == _parameters.ExpectedStatusCode)
+                                StopMeasure();
+                                if(t.IsCompletedSuccessfully)
                                     return new RevokeAlertMessage{StatusCode = t.Result};
                                 return null;
                             }, TaskContinuationOptions.AttachedToParent & TaskContinuationOptions.ExecuteSynchronously)

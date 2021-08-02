@@ -6,7 +6,7 @@ using Monitor.Messages;
 
 namespace Monitor.Actors
 {
-    public class SlackAlertActor : ReceiveActor
+    public class SlackAlertActor : MetricActor
     {
         private const string SLACK_USER = "webhookbot";
         private readonly ISlackClient _slackClient;

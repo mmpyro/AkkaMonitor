@@ -3,14 +3,12 @@ using System.Collections.Generic;
 using Monitor.Messages;
 using Monitor.Factories;
 using System;
-using Akka.Event;
 
 namespace Monitor.Actors
 {
-    public class MonitorManagerActor : ReceiveActor, IWithTimers
+    public class MonitorManagerActor : MetricActor, IWithTimers
     {
         private readonly Dictionary<int, IActorRef> _actorsRef = new Dictionary<int, IActorRef>();
-        private readonly ILoggingAdapter _log = Logging.GetLogger(Context);
         private readonly int _checkInterval;
 
         public MonitorManagerActor(IActorFactory actorFactory, IConfigurationParser configuration)
@@ -25,7 +23,7 @@ namespace Monitor.Actors
             });
 
             Receive<TriggerMessage>(m => {
-                _log.Info("Sending TriggerMessage");
+                Log.Info("Sending TriggerMessage");
                 foreach(var actor in _actorsRef.Values)
                 {
                     actor.Tell(m);
@@ -39,6 +37,7 @@ namespace Monitor.Actors
         protected override void PreStart()
         {
             Timers.StartPeriodicTimer("check", new TriggerMessage(), TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(_checkInterval));
+            base.PreStart();
         }
     }
 }
