@@ -10,6 +10,7 @@ namespace Monitor.Actors
     {
         private const string SLACK_USER = "webhookbot";
         private readonly ISlackClient _slackClient;
+        
         public SlackAlertActor(SlackConfiguration configuration, ISlackClientFactory slackClientFactory)
         {
             _slackClient = slackClientFactory.Create(configuration.Url);

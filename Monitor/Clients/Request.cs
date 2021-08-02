@@ -1,19 +1,20 @@
 using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace Monitor.Clients
 {
     public interface IRequest
     {
-        int Get(string url);
+        Task<int> Get(string url);
     }
 
     public class Request : IRequest
     {
         private readonly HttpClient _client = new HttpClient();
 
-        public int Get(string url)
+        public async Task<int> Get(string url)
         {
-            var response = _client.GetAsync(url).Result;
+            var response = await _client.GetAsync(url);
             return (int)response.StatusCode;
         }
     }

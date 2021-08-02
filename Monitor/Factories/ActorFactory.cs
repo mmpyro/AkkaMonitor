@@ -28,8 +28,7 @@ namespace Monitor.Factories
             switch(message)
             {
                 case CreateHttpMonitorMessage:
-                    var m = message as CreateHttpMonitorMessage;
-                    return Akka.Actor.Props.Create(() => new HttpMonitorActor(RequestParameters.From(m), _requestFactory.Create()));
+                    return HttpMonitorActor.Props(RequestParameters.From((CreateHttpMonitorMessage) message), _requestFactory.Create());
                 default:
                     throw new ArgumentException($"Not supported message type: {message.GetType().Name}");
             }
@@ -40,8 +39,7 @@ namespace Monitor.Factories
             switch(message)
             {
                 case CreateSlackAlertMessage:
-                    var m = message as CreateSlackAlertMessage;
-                    return Akka.Actor.Props.Create(() => new SlackAlertActor(SlackConfiguration.From(m), _slackClientFactory));
+                    return SlackAlertActor.Props(SlackConfiguration.From((CreateSlackAlertMessage) message), _slackClientFactory);
                 default:
                     throw new ArgumentException($"Not supported message type: {message.GetType().Name}");
             }
