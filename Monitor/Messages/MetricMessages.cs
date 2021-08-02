@@ -12,6 +12,7 @@ namespace Monitor.Messages
         public MonitorState State { get; set; }
         public MonitorType Type { get; set; }
         public string Identifier { get; set; }
+        public string[] Labels => new [] {Name, Type.ToString(), Identifier};
     }
 
     public class MonitorLattencyMessage
@@ -20,5 +21,6 @@ namespace Monitor.Messages
         public double Value { get; set; }
         public MonitorType Type { get; set; }
         public string Identifier { get; set; }
+        public string[] Labels => new [] {Name, Type.ToString(), Identifier};
     }
 }

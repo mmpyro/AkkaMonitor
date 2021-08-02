@@ -30,14 +30,14 @@ namespace Monitor.Actors
             Receive<UpMonitorMetricMessage>(m => {
                 Log.Info($"Received {nameof(UpMonitorMetricMessage)} from [{m.Name}, {m.Type}, {m.Identifier}] with state {m.State}");
                 if(m.State == MonitorState.Success)
-                    _alarmsUp.WithLabels(m.Name, m.Type.ToString(), m.Identifier).Set(1);
+                    _alarmsUp.WithLabels(m.Labels).Set(1);
                 else if (m.State == MonitorState.Failed)
-                    _alarmsUp.WithLabels(m.Name, m.Type.ToString(), m.Identifier).Set(0);
+                    _alarmsUp.WithLabels(m.Labels).Set(0);
             });
 
             Receive<MonitorLattencyMessage>(m => {
                 Log.Info($"Received {nameof(MonitorLattencyMessage)} from [{m.Name}, {m.Type}, {m.Identifier}] with value {m.Value}"); 
-                _monitorLattency.WithLabels(m.Name, m.Type.ToString(), m.Identifier).Observe(m.Value);
+                _monitorLattency.WithLabels(m.Labels).Observe(m.Value);
             });
         }
     }
