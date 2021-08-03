@@ -13,6 +13,7 @@ namespace Monitor
 
     public class ConfigurationParser : IConfigurationParser
     {
+        private const int DEFAULT_INTERVAL = 15;
         private readonly IConfigurationRoot _configuration;
         public ConfigurationParser(IConfigurationRoot configuration)
         {
@@ -26,9 +27,9 @@ namespace Monitor
                 var interval = _configuration["CheckInterval"];
                 if (int.TryParse(interval, out int checkInterval))
                 {
-                    return checkInterval;
+                    return checkInterval > 0 ? checkInterval : DEFAULT_INTERVAL;
                 }
-                return 15;
+                return DEFAULT_INTERVAL;
             }
         }
 

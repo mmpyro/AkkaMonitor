@@ -4,9 +4,9 @@ using System.Reflection;
 using Akka.Actor;
 using Akka.Configuration;
 using Monitor.Actors;
-using System.Linq;
 using Autofac;
 using Prometheus;
+using Monitor.Extensions;
 
 namespace Monitor
 {
@@ -24,8 +24,8 @@ namespace Monitor
                 var monitorManager = system.ActorOf(resolver.Create<MonitorManagerActor>());
                 var alertManager = system.ActorOf(resolver.Create<AlertManagerActor>(), nameof(AlertManagerActor));
                 var configurationParser = Container.Instance.Resolve<IConfigurationParser>();
-                configurationParser.Monitors.ToList().ForEach(m => monitorManager.Tell(m));
-                configurationParser.Alerts.ToList().ForEach(m => alertManager.Tell(m));
+                configurationParser.Monitors.Each(m => monitorManager.Tell(m));
+                configurationParser.Alerts.Each(m => alertManager.Tell(m));
 
                 Console.WriteLine("To finish press any key..");
                 Console.ReadKey();
