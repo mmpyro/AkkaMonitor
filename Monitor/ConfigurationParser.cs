@@ -46,6 +46,9 @@ namespace Monitor
                             int expectedStatusCode = int.Parse(monitor["ExpectedStatusCode"]);
                             yield return new CreateHttpMonitorMessage(monitor["Url"], expectedStatusCode);
                             break;
+                        case "DNS":
+                            yield return new CreateDnsMonitorMessage(monitor["Hostname"]);
+                            break;
                         default:
                             break;
                     }

@@ -14,7 +14,7 @@ namespace Monitor
     {
         static void Main(string[] args)
         {
-            var server = new MetricServer(hostname: "localhost", port: 8082);
+            var server = new MetricServer(port: 8082);
             server.Start();
 
             using(var system = ActorSystem.Create("Monitor", LoadActorSystemConfig()))

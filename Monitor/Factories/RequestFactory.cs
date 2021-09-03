@@ -4,12 +4,18 @@ namespace Monitor.Factories
 {
     public interface IRequestFactory
     {
-        IRequest Create();
+        IRequest CreateRequestClient();
+        IDnsRequest CreateDnsRequestClient();
     }
 
     public class RequestFactory : IRequestFactory
     {
-        public IRequest Create()
+        public IDnsRequest CreateDnsRequestClient()
+        {
+            return new DnsRequest();
+        }
+
+        public IRequest CreateRequestClient()
         {
             return new Request();
         }

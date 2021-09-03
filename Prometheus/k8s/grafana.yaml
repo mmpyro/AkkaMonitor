@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana
+  namespace: monitoring
+spec:
+  selector:
+    matchLabels:
+      app: grafana
+  strategy:
+    type: Recreate
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: grafana
+    spec:
+      containers:
+      - name: grafana
+        image: grafana/grafana
+        imagePullPolicy: IfNotPresent
+        resources:
+          limits:
+            memory: "2Gi"
+            cpu: "1500m"
+          requests:
+            memory: "250Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 3000
+        volumeMounts:
+          - name: grafana-log
+            mountPath: /var/log/grafana
+          - name: grafana
+            mountPath: /var/lib/grafana
+      volumes:
+        - name: grafana
+          persistentVolumeClaim:
+            claimName: grafana
+        - name: grafana-log
+          persistentVolumeClaim:
+            claimName: grafana-log
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana
+  namespace: monitoring
+spec:
+  selector:
+    app: grafana
+  ports:
+  - port: 3000
+    targetPort: 3000
+  type: LoadBalancer
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: grafana-log
+  namespace: monitoring
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 150Mi
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: grafana
+  namespace: monitoring
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 200Mi

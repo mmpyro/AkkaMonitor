@@ -17,6 +17,7 @@ namespace Monitor.Actors
 
         private class RevokeAlertMessage
         {
+            public string Content { get; set; }
             public int StatusCode { get; set; }
         }
 
@@ -74,9 +75,8 @@ namespace Monitor.Actors
             Receive<RevokeAlertMessage>(m => {
                 if(m.StatusCode == _parameters.ExpectedStatusCode)
                 {
-                    var content = $"Http request has finished with {m.StatusCode} status code when call {_parameters.Url}.";
                     var selection = Context.System.ActorSelection(ALERT_MANAGER);
-                    selection.Tell(new TriggerAlertCancelationMessage(content));
+                    selection.Tell(new TriggerAlertCancelationMessage(m.Content));
                     Log.Info("Sending TriggerAlertCancelationMessage");
                     Become(Success);
                 }
@@ -89,8 +89,11 @@ namespace Monitor.Actors
                 _request.Get(_parameters.Url)
                         .ContinueWith(t => {
                                 StopMeasure();
-                                if(t.IsCompletedSuccessfully)
-                                    return new RevokeAlertMessage{StatusCode = t.Result};
+                                if(t.IsCompletedSuccessfully) {
+                                    var statusCode = t.Result;
+                                    var content = $"Http request has finished with {statusCode} status code when call {_parameters.Url}.";
+                                    return new RevokeAlertMessage{StatusCode = statusCode, Content= content};
+                                }
                                 return null;
                             }, TaskContinuationOptions.AttachedToParent & TaskContinuationOptions.ExecuteSynchronously)
                         .PipeTo(Self);
