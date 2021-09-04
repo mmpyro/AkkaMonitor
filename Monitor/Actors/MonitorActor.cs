@@ -1,22 +1,27 @@
+using System;
 using System.Diagnostics;
+using Akka.Actor;
 using Monitor.Enums;
 using Monitor.Messages;
 
 namespace Monitor.Actors
 {
-    public class MonitorActor : MetricActor
+    public class MonitorActor : MetricActor, IWithTimers
     {
         private readonly Stopwatch _sw = new Stopwatch();
-        private MonitorType _monitorType;
+        private readonly MonitorType _monitorType;
         private MonitorState _monitorState = MonitorState.Success;
-        private string _monitorName;
-        private string _identifier;
+        private readonly string _monitorName;
+        private readonly string _identifier;
+        private readonly int _checkInterval;
+        public ITimerScheduler Timers { get; set; }
 
-        public MonitorActor(string monitorName, MonitorType monitorType, string identifier)
+        public MonitorActor(string monitorName, MonitorType monitorType, string identifier, int checkInterval)
         {
             _monitorType = monitorType;
             _monitorName = monitorName;
             _identifier = identifier;
+            _checkInterval = checkInterval;
             Become(Success);
         }
 
@@ -65,6 +70,12 @@ namespace Monitor.Actors
             Log.Info("Become Success");
             _monitorState = MonitorState.Success;
             UpdateMonitorState();
+        }
+
+        protected override void PreStart()
+        {
+            Timers.StartPeriodicTimer($"{_monitorType}_{_identifier}", new TriggerMessage(), TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(_checkInterval));
+            base.PreStart();
         }
     }
 }

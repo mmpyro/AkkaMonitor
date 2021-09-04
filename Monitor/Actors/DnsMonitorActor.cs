@@ -22,7 +22,7 @@ namespace Monitor.Actors
         private readonly DnsParameters _parameters;
         private readonly IDnsRequest _dnsRequest;
 
-        public DnsMonitorActor(DnsParameters parameters, IDnsRequest dnsRequest) : base(nameof(DnsMonitorActor), MonitorType.DNS, parameters.Hostname)
+        public DnsMonitorActor(DnsParameters parameters, IDnsRequest dnsRequest) : base(nameof(DnsMonitorActor), MonitorType.DNS, parameters.Hostname, parameters.CheckInterval)
         {
             _dnsRequest = dnsRequest;
             _parameters = parameters;

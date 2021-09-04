@@ -25,7 +25,7 @@ namespace Monitor.Actors
         private readonly IRequest _request;
 
         
-        public HttpMonitorActor(RequestParameters parameters, IRequest request) : base(nameof(HttpMonitorActor), MonitorType.Http, parameters.Url)
+        public HttpMonitorActor(RequestParameters parameters, IRequest request) : base(nameof(HttpMonitorActor), MonitorType.Http, parameters.Url, parameters.CheckInterval)
         {
             _request = request;
             _parameters = parameters;
