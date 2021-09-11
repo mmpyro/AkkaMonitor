@@ -9,16 +9,27 @@ namespace Monitor.Actors
 {
     public class HttpMonitorActor : MonitorActor
     {
-        private class SendAlertMessage
+        private class AlertMessage
         {
-            public string Content { get; set; }
-            public int? StatusCode { get; set; }
+            public AlertMessage(string content = null, int? statucCode =  null)
+            {
+                Content = content;
+                StatusCode = statucCode;
+            }
+
+            public string Content { get; private set; }
+            public int? StatusCode { get; private set; }
         }
 
-        private class RevokeAlertMessage
+        private class SendAlertMessage : AlertMessage
         {
-            public string Content { get; set; }
-            public int StatusCode { get; set; }
+            public SendAlertMessage(string content = null, int? statucCode =  null) : base(content, statucCode) {}
+
+        }
+
+        private class RevokeAlertMessage : AlertMessage
+        {
+            public RevokeAlertMessage(string content = null, int? statucCode =  null) : base(content, statucCode) {}
         }
 
         private readonly RequestParameters _parameters;
@@ -56,12 +67,12 @@ namespace Monitor.Actors
                             if(t.IsFaulted)
                             {
                                 var ex = t.Exception;
-                                return new SendAlertMessage{ Content = $"Http request has finished with error {ex.Message}"};
+                                return new SendAlertMessage($"Http request has finished with error {ex.Message}");
                             }
                             else if(t.IsCompletedSuccessfully)
                             {
                                 var content = $"Http request has finished with {t.Result} status code when call {_parameters.Url}. Expected {_parameters.ExpectedStatusCode} status code.";
-                                return new SendAlertMessage{ Content = content, StatusCode = t.Result};
+                                return new SendAlertMessage(content, t.Result);
                             }
                             return null;
                         }, TaskContinuationOptions.AttachedToParent & TaskContinuationOptions.ExecuteSynchronously)
@@ -92,7 +103,7 @@ namespace Monitor.Actors
                                 if(t.IsCompletedSuccessfully) {
                                     var statusCode = t.Result;
                                     var content = $"Http request has finished with {statusCode} status code when call {_parameters.Url}.";
-                                    return new RevokeAlertMessage{StatusCode = statusCode, Content= content};
+                                    return new RevokeAlertMessage(content, statusCode);
                                 }
                                 return null;
                             }, TaskContinuationOptions.AttachedToParent & TaskContinuationOptions.ExecuteSynchronously)

@@ -14,6 +14,7 @@ namespace Monitor
     {
         private const int DEFAULT_INTERVAL = 15;
         private readonly IConfigurationRoot _configuration;
+        
         public ConfigurationParser(IConfigurationRoot configuration)
         {
             _configuration = configuration;

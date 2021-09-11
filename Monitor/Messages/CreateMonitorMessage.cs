@@ -1,15 +1,19 @@
 namespace Monitor.Messages
 {
     public class CreateMonitorMessage {
-        public int CheckInterval { get; protected set; }
+        public int CheckInterval { get; private set; }
+
+        public CreateMonitorMessage(int checkInterval)
+        {
+            CheckInterval = checkInterval;
+        }
     }
 
     public class CreateDnsMonitorMessage : CreateMonitorMessage
     {
-        public CreateDnsMonitorMessage(string hostName, int checkInterval)
+        public CreateDnsMonitorMessage(string hostName, int checkInterval) : base(checkInterval)
         {
             Hostname = hostName;
-            CheckInterval = checkInterval;
         }
 
         public string Hostname { get; private set; }
@@ -37,11 +41,10 @@ namespace Monitor.Messages
 
     public class CreateHttpMonitorMessage : CreateMonitorMessage
     {
-        public CreateHttpMonitorMessage(string url, int expectedStatusCode, int checkInterval)
+        public CreateHttpMonitorMessage(string url, int expectedStatusCode, int checkInterval) : base(checkInterval)
         {
             Url = url;
             ExpectedStatusCode = expectedStatusCode;
-            CheckInterval = checkInterval;
         }
 
         public string Url { get; private set; }

@@ -8,6 +8,8 @@ namespace Monitor.Actors
     {
         protected const string PROMETHEUS = "/user/PrometheusMetricActor";
         protected const string ALERT_MANAGER = "/user/AlertManagerActor";
+        protected const string MONITOR_MANAGER = "/user/MonitorManagerActor";
+
         protected readonly ILoggingAdapter Log = Logging.GetLogger(Context);
 
         protected void SendActiveActorMetric()

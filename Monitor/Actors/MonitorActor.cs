@@ -39,23 +39,13 @@ namespace Monitor.Actors
         private void UpdateMonitorState()
         {
             var selection = Context.System.ActorSelection(PROMETHEUS);
-            selection.Tell(new UpMonitorMetricMessage{
-                Name = _monitorName,
-                State = _monitorState,
-                Type = _monitorType,
-                Identifier = _identifier
-            });
+            selection.Tell(new UpMonitorMetricMessage(_monitorName, _monitorType, _identifier, _monitorState));
         }
 
         protected void SendMonitorLattencyMessage()
         {
             var selection = Context.System.ActorSelection(PROMETHEUS);
-            selection.Tell(new MonitorLattencyMessage{
-                Name = _monitorName,
-                Value = _sw.Elapsed.TotalMilliseconds,
-                Type = _monitorType,
-                Identifier = _identifier
-            });
+            selection.Tell(new MonitorLattencyMessage(_monitorName, _monitorType, _identifier, _sw.Elapsed.TotalMilliseconds));
         }
 
         protected virtual void Failed()

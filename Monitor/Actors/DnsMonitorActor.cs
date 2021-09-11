@@ -9,14 +9,24 @@ namespace Monitor.Actors
 {
     public class DnsMonitorActor : MonitorActor
     {
-        private class SendAlertMessage
+        private class AlertMessage
         {
-            public string Content { get; set; }
+            public AlertMessage(string content = null)
+            {
+                Content = content;
+            }
+
+            public string Content { get; private set; }
         }
 
-        private class RevokeAlertMessage
+        private class SendAlertMessage : AlertMessage
         {
-            public string Content { get; set; }
+            public SendAlertMessage(string content = null) : base(content) {}
+        }
+
+        private class RevokeAlertMessage : AlertMessage
+        {
+            public RevokeAlertMessage(string content = null) : base(content) {}
         }
 
         private readonly DnsParameters _parameters;
@@ -57,7 +67,7 @@ namespace Monitor.Actors
                             if (t.IsFaulted)
                             {
                                 var ex = t.Exception;
-                                return new SendAlertMessage { Content = ex.Message};
+                                return new SendAlertMessage(ex.Message);
                             }
                             return new SendAlertMessage();
                         }, TaskContinuationOptions.AttachedToParent & TaskContinuationOptions.ExecuteSynchronously)
@@ -88,7 +98,7 @@ namespace Monitor.Actors
                         {
                             StopMeasure();
                             if (t.IsCompletedSuccessfully)
-                                return new RevokeAlertMessage{ Content = $"DNS hostname: {_parameters.Hostname} resolved."};
+                                return new RevokeAlertMessage($"DNS hostname: {_parameters.Hostname} resolved.");
                             return new RevokeAlertMessage();
                         }, TaskContinuationOptions.AttachedToParent & TaskContinuationOptions.ExecuteSynchronously)
                         .PipeTo(Self);

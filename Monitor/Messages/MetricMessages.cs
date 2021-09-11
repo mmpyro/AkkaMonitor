@@ -8,19 +8,36 @@ namespace Monitor.Messages
 
     public class MetricMessage
     {
-        public string Name { get; set; }
-        public MonitorType Type { get; set; }
-        public string Identifier { get; set; }
+        public MetricMessage(string name, MonitorType type, string identifier)
+        {
+            Name = name;
+            Type = type;
+            Identifier = identifier;
+        }
+
+        public string Name { get; private set; }
+        public MonitorType Type { get; private set; }
+        public string Identifier { get; private set; }
         public virtual string[] Labels => new [] {Name, Type.ToString(), Identifier};
     }
 
     public class UpMonitorMetricMessage : MetricMessage
     {
-        public MonitorState State { get; set; }
+        public UpMonitorMetricMessage(string name, MonitorType type, string identifier, MonitorState state) : base(name, type, identifier)
+        {
+            State = state;
+        }
+
+        public MonitorState State { get; private set; }
     }
 
     public class MonitorLattencyMessage : MetricMessage
     {
-        public double Value { get; set; }
+        public MonitorLattencyMessage(string name, MonitorType type, string identifier, double  value) : base(name, type, identifier)
+        {
+            Value = value;
+        }
+
+        public double Value { get; private set; }
     }
 }

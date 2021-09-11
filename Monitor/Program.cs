@@ -4,9 +4,7 @@ using System.Reflection;
 using Akka.Actor;
 using Akka.Configuration;
 using Monitor.Actors;
-using Autofac;
 using Prometheus;
-using Monitor.Extensions;
 
 namespace Monitor
 {
@@ -14,22 +12,18 @@ namespace Monitor
     {
         static void Main(string[] args)
         {
-            var server = new MetricServer(port: 8082);
-            server.Start();
-
+            using(var server = new MetricServer(port: 8082))
             using(var system = ActorSystem.Create("Monitor", LoadActorSystemConfig()))
             {
+                server.Start();
                 var resolver = Container.DependencyResolver(system);
+                var configuration = system.ActorOf(resolver.Create<ConfigurationActor>(), nameof(ConfigurationActor));
                 var prometheus = system.ActorOf(resolver.Create<PrometheusMetricActor>(), nameof(PrometheusMetricActor));
-                var monitorManager = system.ActorOf(resolver.Create<MonitorManagerActor>());
+                var monitorManager = system.ActorOf(resolver.Create<MonitorManagerActor>(), nameof(MonitorManagerActor));
                 var alertManager = system.ActorOf(resolver.Create<AlertManagerActor>(), nameof(AlertManagerActor));
-                var configurationParser = Container.Instance.Resolve<IConfigurationParser>();
-                configurationParser.Monitors.Each(m => monitorManager.Tell(m));
-                configurationParser.Alerts.Each(m => alertManager.Tell(m));
 
                 Console.WriteLine("To finish press any key..");
                 Console.ReadKey();
-                server.Stop();
             }
         }
 
