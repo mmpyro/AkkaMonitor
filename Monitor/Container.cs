@@ -34,6 +34,8 @@ namespace Monitor
                             builder.RegisterType<ActorFactory>().As<IActorFactory>();
                             builder.RegisterType<MonitorManagerActor>();
                             builder.RegisterType<AlertManagerActor>();
+                            builder.RegisterType<PrometheusMetricActor>();
+                            builder.RegisterType<ConfigurationActor>();
                             _instance = builder.Build();
                         }
                     }

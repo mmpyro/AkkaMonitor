@@ -6,30 +6,27 @@ namespace Monitor
 {
     public interface IConfigurationParser
     {
-        int CheckInterval { get; }
         IEnumerable<CreateMonitorMessage> Monitors { get; }
         IEnumerable<CreateAlertMessage> Alerts { get; }
     }
 
     public class ConfigurationParser : IConfigurationParser
     {
+        private const int DEFAULT_INTERVAL = 15;
         private readonly IConfigurationRoot _configuration;
+        
         public ConfigurationParser(IConfigurationRoot configuration)
         {
             _configuration = configuration;
         }
 
-        public int CheckInterval
+        private int CheckInterval(string interval)
         {
-            get
+            if (int.TryParse(interval, out int checkInterval))
             {
-                var interval = _configuration["CheckInterval"];
-                if (int.TryParse(interval, out int checkInterval))
-                {
-                    return checkInterval;
-                }
-                return 15;
+                return checkInterval > 0 ? checkInterval : DEFAULT_INTERVAL;
             }
+            return DEFAULT_INTERVAL;
         }
 
         public IEnumerable<CreateMonitorMessage> Monitors
@@ -43,7 +40,10 @@ namespace Monitor
                     {
                         case "Http":
                             int expectedStatusCode = int.Parse(monitor["ExpectedStatusCode"]);
-                            yield return new CreateHttpMonitorMessage(monitor["Url"], expectedStatusCode);
+                            yield return new CreateHttpMonitorMessage(monitor["Url"], expectedStatusCode, CheckInterval(monitor["CheckInterval"]));
+                            break;
+                        case "DNS":
+                            yield return new CreateDnsMonitorMessage(monitor["Hostname"], CheckInterval(monitor["CheckInterval"]));
                             break;
                         default:
                             break;

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Monitor.Actors
 {
-    public class AlertManagerActor : ReceiveActor
+    public class AlertManagerActor : MetricActor
     {
         private readonly Dictionary<int, IActorRef> _actorsRef = new Dictionary<int, IActorRef>();
 
