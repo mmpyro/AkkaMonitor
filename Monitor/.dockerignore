@@ -1,0 +1,5 @@
+appsettings.json
+bin
+out
+Dockerfile
+.dockerignore

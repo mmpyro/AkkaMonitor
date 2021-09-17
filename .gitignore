@@ -394,3 +394,6 @@ FodyWeavers.xsd
 monitors.csv
 monitors.json
 monitor_generator.py
+
+# Other
+out
