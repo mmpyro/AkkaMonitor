@@ -33,6 +33,15 @@ namespace Monitor.Actors
                     actor.Tell(m);
                 }
             });
+
+            Receive<DeleteActorMessage>(m => {
+                if(_actorsRef.TryGetValue(m.Id, out IActorRef child))
+                {
+                    Context.Unwatch(child);
+                    _actorsRef.Remove(m.Id);
+                    child.Tell(PoisonPill.Instance);
+                }
+            });
         }
     }
 }

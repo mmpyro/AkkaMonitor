@@ -1,7 +1,6 @@
 using System;
 using Akka.Actor;
 using Monitor.Actors;
-using Monitor.Dtos;
 using Monitor.Messages;
 
 namespace Monitor.Factories
@@ -28,9 +27,9 @@ namespace Monitor.Factories
             switch(message)
             {
                 case CreateHttpMonitorMessage:
-                    return HttpMonitorActor.Props(RequestParameters.From((CreateHttpMonitorMessage) message), _requestFactory.CreateRequestClient());
+                    return HttpMonitorActor.Props((CreateHttpMonitorMessage) message, _requestFactory.CreateRequestClient());
                 case CreateDnsMonitorMessage:
-                    return DnsMonitorActor.Props(DnsParameters.From((CreateDnsMonitorMessage)message), _requestFactory.CreateDnsRequestClient());
+                    return DnsMonitorActor.Props((CreateDnsMonitorMessage) message, _requestFactory.CreateDnsRequestClient());
                 default:
                     throw new ArgumentException($"Not supported message type: {message.GetType().Name}");
             }
@@ -41,7 +40,7 @@ namespace Monitor.Factories
             switch(message)
             {
                 case CreateSlackAlertMessage:
-                    return SlackAlertActor.Props(SlackConfiguration.From((CreateSlackAlertMessage) message), _slackClientFactory);
+                    return SlackAlertActor.Props((CreateSlackAlertMessage) message, _slackClientFactory);
                 default:
                     throw new ArgumentException($"Not supported message type: {message.GetType().Name}");
             }

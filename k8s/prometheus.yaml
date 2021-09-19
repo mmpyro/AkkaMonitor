@@ -36,7 +36,7 @@ spec:
       volumes:
         - name: config
           configMap:
-            name: prometheus-config-v005
+            name: prometheus-config-v006
             items:
               - key: prometheus.yml
                 path: prometheus.yml
@@ -63,7 +63,7 @@ spec:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: prometheus-config-v005
+  name: prometheus-config-v006
   namespace: monitoring
 data:
   prometheus.yml: |
@@ -79,7 +79,7 @@ data:
         - targets: ['localhost:9090']
       - job_name: 'monitoring'
         static_configs:
-        - targets: ['host.minikube.internal:8082']
+        - targets: ['monitoring-service:8082']
 
 ---
 apiVersion: v1

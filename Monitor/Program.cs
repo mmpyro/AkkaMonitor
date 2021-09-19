@@ -1,6 +1,6 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Reflection;
+using System.Threading;
 using Akka.Actor;
 using Akka.Configuration;
 using Monitor.Actors;
@@ -22,8 +22,7 @@ namespace Monitor
                 var monitorManager = system.ActorOf(resolver.Create<MonitorManagerActor>(), nameof(MonitorManagerActor));
                 var alertManager = system.ActorOf(resolver.Create<AlertManagerActor>(), nameof(AlertManagerActor));
 
-                Console.WriteLine("To finish press any key..");
-                Console.ReadKey();
+                Thread.Sleep(Timeout.Infinite);
             }
         }
 

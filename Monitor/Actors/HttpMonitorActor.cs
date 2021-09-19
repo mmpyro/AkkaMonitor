@@ -1,6 +1,5 @@
 using Akka.Actor;
 using Monitor.Clients;
-using Monitor.Dtos;
 using Monitor.Messages;
 using System.Threading.Tasks;
 using Monitor.Enums;
@@ -32,14 +31,14 @@ namespace Monitor.Actors
             public RevokeAlertMessage(string content = null, int? statucCode =  null) : base(content, statucCode) {}
         }
 
-        private readonly RequestParameters _parameters;
+        private readonly CreateHttpMonitorMessage _parameters;
         private readonly IRequest _request;
 
         
-        public HttpMonitorActor(RequestParameters parameters, IRequest request) : base(nameof(HttpMonitorActor), MonitorType.Http, parameters.Url, parameters.CheckInterval)
+        public HttpMonitorActor(CreateHttpMonitorMessage message, IRequest request) : base(nameof(HttpMonitorActor), MonitorType.Http, message.Url, message.CheckInterval)
         {
             _request = request;
-            _parameters = parameters;
+            _parameters = message;
         }
 
         protected override void Success()
@@ -111,9 +110,9 @@ namespace Monitor.Actors
             });
         }
 
-        public static Props Props(RequestParameters parameters, IRequest request)
+        public static Props Props(CreateHttpMonitorMessage message, IRequest request)
         {
-            return Akka.Actor.Props.Create(() => new HttpMonitorActor(parameters, request));
+            return Akka.Actor.Props.Create(() => new HttpMonitorActor(message, request));
         }
     }
 }

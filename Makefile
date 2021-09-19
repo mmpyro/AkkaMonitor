@@ -1,7 +1,7 @@
 monitor='./Monitor/Monitor.csproj'
 web='./Web'
 image='michalmarszalek/akka-monitor'
-tag='1.0'
+tag='1.2'
 
 build:
 	dotnet build

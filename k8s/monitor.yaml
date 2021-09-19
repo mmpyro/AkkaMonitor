@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: akka-monitor
+  name: akka-monitor
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: akka-monitor
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: akka-monitor
+    spec:
+      containers:
+      - image: michalmarszalek/akka-monitor:1.2
+        imagePullPolicy: IfNotPresent
+        name: monitor
+        ports:
+        - containerPort: 8082
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "260Mi"
+          limits:
+            cpu: "1000m"
+            memory: "1Gi"
+        volumeMounts:
+        - name: config
+          mountPath: "/home/app/config"
+          readOnly: true
+      volumes:
+      - name: config
+        configMap:
+          name: appsettings-v001
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: akka-monitor
+  namespace: monitoring
+  name: monitoring-service
+spec:
+  ports:
+  - name: prometheus
+    port: 8082
+    protocol: TCP
+    targetPort: 8082
+  selector:
+    app: akka-monitor
+  type: ClusterIP
+status:
+  loadBalancer: {}
