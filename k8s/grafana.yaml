@@ -3,6 +3,8 @@ kind: Deployment
 metadata:
   name: grafana
   namespace: monitoring
+  labels:
+    app: grafana
 spec:
   selector:
     matchLabels:
@@ -47,6 +49,8 @@ kind: Service
 metadata:
   name: grafana
   namespace: monitoring
+  labels:
+    app: grafana
 spec:
   selector:
     app: grafana

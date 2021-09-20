@@ -3,6 +3,8 @@ kind: Deployment
 metadata:
   name: prometheus
   namespace: monitoring
+  labels:
+    app: prometheus
 spec:
   selector:
     matchLabels:
@@ -87,6 +89,8 @@ kind: PersistentVolumeClaim
 metadata:
   name: prometheus-data
   namespace: monitoring
+  labels:
+    app: prometheus
 spec:
   accessModes:
     - ReadWriteOnce
