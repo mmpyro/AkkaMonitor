@@ -3,6 +3,7 @@ using Monitor.Clients;
 using Monitor.Messages;
 using System.Threading.Tasks;
 using Monitor.Enums;
+using InitParameters = Monitor.Messages.CreateDnsMonitorMessage;
 
 namespace Monitor.Actors
 {
@@ -28,13 +29,13 @@ namespace Monitor.Actors
             public RevokeAlertMessage(string content = null) : base(content) {}
         }
 
-        private readonly CreateDnsMonitorMessage _parameters;
+        private readonly InitParameters _parameters;
         private readonly IDnsRequest _dnsRequest;
 
-        public DnsMonitorActor(CreateDnsMonitorMessage message, IDnsRequest dnsRequest) : base(nameof(DnsMonitorActor), MonitorType.DNS, message.Hostname, message.CheckInterval)
+        public DnsMonitorActor(InitParameters parameters, IDnsRequest dnsRequest) : base(nameof(DnsMonitorActor), MonitorType.DNS, parameters.Hostname, parameters.CheckInterval)
         {
             _dnsRequest = dnsRequest;
-            _parameters = message;
+            _parameters = parameters;
         }
 
         protected override void Success()
@@ -104,9 +105,9 @@ namespace Monitor.Actors
             });
         }
 
-        public static Props Props(CreateDnsMonitorMessage message, IDnsRequest dnsRequest)
+        public static Props Props(InitParameters parameters, IDnsRequest dnsRequest)
         {
-            return Akka.Actor.Props.Create(() => new DnsMonitorActor(message, dnsRequest));
+            return Akka.Actor.Props.Create(() => new DnsMonitorActor(parameters, dnsRequest));
         }
     }
 }

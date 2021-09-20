@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Reflection;
 using System.Threading;
 using Akka.Actor;
@@ -10,9 +11,28 @@ namespace Monitor
 {
     class Program
     {
+        private static bool _sigintReceived = false;
+        private static bool _wait = true;
         static void Main(string[] args)
         {
-            using(var server = new MetricServer(port: 8082))
+            Console.CancelKeyPress += (_, e) =>
+            {
+                e.Cancel = true;
+                _wait = false;
+                _sigintReceived = true;
+                Console.WriteLine("Closing application received SIGINT.");
+            };
+
+            AppDomain.CurrentDomain.ProcessExit += (_, _) =>
+            {
+                if (!_sigintReceived)
+                {
+                    _wait = false;
+                    Console.WriteLine("Closing application received SIGTERM.");
+                }
+            };
+
+            using (var server = new MetricServer(port: 8082))
             using(var system = ActorSystem.Create("Monitor", LoadActorSystemConfig()))
             {
                 server.Start();
@@ -22,7 +42,10 @@ namespace Monitor
                 var monitorManager = system.ActorOf(resolver.Create<MonitorManagerActor>(), nameof(MonitorManagerActor));
                 var alertManager = system.ActorOf(resolver.Create<AlertManagerActor>(), nameof(AlertManagerActor));
 
-                Thread.Sleep(Timeout.Infinite);
+                while(_wait)
+                {
+                    Thread.Sleep(TimeSpan.FromSeconds(1));
+                }
             }
         }
 

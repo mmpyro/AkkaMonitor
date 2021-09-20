@@ -32,7 +32,7 @@ spec:
             memory: "1Gi"
         volumeMounts:
         - name: config
-          mountPath: "/home/app/config"
+          mountPath: "/home/app/Config"
           readOnly: true
       volumes:
       - name: config

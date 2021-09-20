@@ -22,7 +22,7 @@ namespace Monitor
                         if(_instance == null)
                         {
                             var configuration = new ConfigurationBuilder()
-                            .AddJsonFile("config/appsettings.json", optional: false, reloadOnChange: true)
+                            .AddJsonFile("Config/appsettings.json", optional: false, reloadOnChange: true)
                             .AddEnvironmentVariables()
                             .Build();
                             

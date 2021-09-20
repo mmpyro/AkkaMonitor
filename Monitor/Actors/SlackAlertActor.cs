@@ -3,6 +3,7 @@ using Akka.Actor;
 using Monitor.Clients;
 using Monitor.Factories;
 using Monitor.Messages;
+using InitParameters = Monitor.Messages.CreateSlackAlertMessage;
 
 namespace Monitor.Actors
 {
@@ -11,30 +12,30 @@ namespace Monitor.Actors
         private const string SLACK_USER = "webhookbot";
         private readonly ISlackClient _slackClient;
         
-        public SlackAlertActor(CreateSlackAlertMessage message, ISlackClientFactory slackClientFactory)
+        public SlackAlertActor(InitParameters parameters, ISlackClientFactory slackClientFactory)
         {
             try
             {
-                _slackClient = slackClientFactory.Create(message.Url);
+                _slackClient = slackClientFactory.Create(parameters.Url);
+
+                Receive<TriggerAlertMessage>(m => {
+                    _slackClient.PostMessage(m.Content, SLACK_USER, parameters.Channel);
+                });
+
+                Receive<TriggerAlertCancelationMessage>(m => {
+                    _slackClient.PostMessage(m.Content, SLACK_USER, parameters.Channel);
+                });
             }
             catch(UriFormatException ex)
             {
                 Log.Error(ex, $"Exception during {nameof(SlackAlertActor)} actor creation. Invalid slack url. Actor is stoped.");
-                Context.Parent.Tell(new DeleteActorMessage(message.GetHashCode()));
+                Context.Parent.Tell(new DeleteActorMessage(parameters.GetHashCode()));
             }
-
-            Receive<TriggerAlertMessage>(m => {
-                _slackClient.PostMessage(m.Content, SLACK_USER, message.Channel);
-            });
-
-            Receive<TriggerAlertCancelationMessage>(m => {
-                _slackClient.PostMessage(m.Content, SLACK_USER, message.Channel);
-            });
         }
 
-        public static Props Props(CreateSlackAlertMessage message, ISlackClientFactory slackClientFactory)
+        public static Props Props(InitParameters parameters, ISlackClientFactory slackClientFactory)
         {
-            return Akka.Actor.Props.Create(() => new SlackAlertActor(message, slackClientFactory));
+            return Akka.Actor.Props.Create(() => new SlackAlertActor(parameters, slackClientFactory));
         }
     }
 }
