@@ -53,6 +53,9 @@ namespace Monitor.Actors
             Log.Info("Become Failed");
             _monitorState = MonitorState.Failed;
             UpdateMonitorState();
+            Receive<MonitorStatusMessageReq>(m => {
+                Sender.Tell(new MonitorStatusMessageRes(_monitorName, _checkInterval, _identifier, _monitorType, MonitorState.Failed));
+            });
         }
 
         protected virtual void Success()
@@ -60,11 +63,16 @@ namespace Monitor.Actors
             Log.Info("Become Success");
             _monitorState = MonitorState.Success;
             UpdateMonitorState();
+            Receive<MonitorStatusMessageReq>(m => {
+                Sender.Tell(new MonitorStatusMessageRes(_monitorName, _checkInterval, _identifier, _monitorType, MonitorState.Success));
+            });
         }
 
         protected override void PreStart()
         {
-            Timers.StartPeriodicTimer($"{_monitorType}_{_identifier}", new TriggerMessage(), TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(_checkInterval));
+            var rnd = new Random(Guid.NewGuid().GetHashCode());
+            var initialDelay = rnd.Next(0, 3);
+            Timers.StartPeriodicTimer($"{_monitorType}_{_identifier}", new TriggerMessage(), TimeSpan.FromSeconds(initialDelay), TimeSpan.FromSeconds(_checkInterval));
             base.PreStart();
         }
     }

@@ -1,0 +1,13 @@
+k8s
+Web
+Makefile
+monitor_generator.py
+monitor.json
+monitor.csv
+out
+
+MonitorConsole/Config
+**/*/bin
+**/*/out
+Dockerfile
+.dockerignore

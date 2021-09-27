@@ -36,7 +36,7 @@ namespace Monitor.Actors
         private readonly IRequest _request;
 
         
-        public HttpMonitorActor(InitParamaters parameters, IRequest request) : base(nameof(HttpMonitorActor), MonitorType.Http, parameters.Url, parameters.CheckInterval)
+        public HttpMonitorActor(InitParamaters parameters, IRequest request) : base(parameters.Name, MonitorType.Http, parameters.Identifier, parameters.CheckInterval)
         {
             _request = request;
             _parameters = parameters;
@@ -61,7 +61,7 @@ namespace Monitor.Actors
             Receive<TriggerMessage>(m =>
             {
                 StartMeasure();
-                _request.Get(_parameters.Url)
+                _request.Get(_parameters.Identifier)
                         .ContinueWith(t => {
                             StopMeasure();
                             if(t.IsFaulted)
@@ -71,7 +71,7 @@ namespace Monitor.Actors
                             }
                             else if(t.IsCompletedSuccessfully)
                             {
-                                var content = $"Http request has finished with {t.Result} status code when call {_parameters.Url}. Expected {_parameters.ExpectedStatusCode} status code.";
+                                var content = $"Http request has finished with {t.Result} status code when call {_parameters.Identifier}. Expected {_parameters.ExpectedStatusCode} status code.";
                                 return new SendAlertMessage(content, t.Result);
                             }
                             return null;
@@ -97,12 +97,12 @@ namespace Monitor.Actors
             Receive<TriggerMessage>(m =>
             {
                 StartMeasure();
-                _request.Get(_parameters.Url)
+                _request.Get(_parameters.Identifier)
                         .ContinueWith(t => {
                                 StopMeasure();
                                 if(t.IsCompletedSuccessfully) {
                                     var statusCode = t.Result;
-                                    var content = $"Http request has finished with {statusCode} status code when call {_parameters.Url}.";
+                                    var content = $"Http request has finished with {statusCode} status code when call {_parameters.Identifier}.";
                                     return new RevokeAlertMessage(content, statusCode);
                                 }
                                 return null;

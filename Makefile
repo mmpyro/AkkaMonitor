@@ -1,7 +1,7 @@
-monitor='./Monitor/Monitor.csproj'
+monitor='./MonitorConsole/MonitorConsole.csproj'
 web='./Web'
 image='michalmarszalek/akka-monitor'
-tag='1.3'
+tag='1.4'
 
 build:
 	dotnet build
@@ -23,9 +23,9 @@ start:
 	npm start --prefix $(web)
 
 build_image:
-	cd Monitor;docker build -t $(image):$(tag) .
+	docker build -t $(image):$(tag) .
 
 push_image:
-	cd Monitor;docker push $(image):$(tag)
-	cd Monitor;docker tag $(image):$(tag) $(image)
-	cd Monitor;docker push $(image)
+	docker push $(image):$(tag)
+	docker tag $(image):$(tag) $(image)
+	docker push $(image)

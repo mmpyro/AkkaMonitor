@@ -1,3 +1,4 @@
+using Akka.Actor;
 using Akka.Event;
 using Monitor.Enums;
 using Monitor.Messages;
@@ -39,6 +40,11 @@ namespace Monitor.Actors
                 Log.Info($"Received {nameof(MonitorLattencyMessage)} from [{m.Name}, {m.Type}, {m.Identifier}] with value {m.Value}"); 
                 _monitorLattency.WithLabels(m.Labels).Observe(m.Value);
             });
+        }
+
+        public static Props Create()
+        {
+            return Props.Create(() => new PrometheusMetricActor());
         }
     }
 }

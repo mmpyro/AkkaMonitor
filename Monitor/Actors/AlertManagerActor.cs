@@ -43,5 +43,10 @@ namespace Monitor.Actors
                 }
             });
         }
+
+        public static Props Create(IActorFactory factory)
+        {
+            return Props.Create(() => new AlertManagerActor(factory));
+        }
     }
 }

@@ -32,7 +32,7 @@ namespace Monitor.Actors
         private readonly InitParameters _parameters;
         private readonly IDnsRequest _dnsRequest;
 
-        public DnsMonitorActor(InitParameters parameters, IDnsRequest dnsRequest) : base(nameof(DnsMonitorActor), MonitorType.DNS, parameters.Hostname, parameters.CheckInterval)
+        public DnsMonitorActor(InitParameters parameters, IDnsRequest dnsRequest) : base(parameters.Name, MonitorType.DNS, parameters.Identifier, parameters.CheckInterval)
         {
             _dnsRequest = dnsRequest;
             _parameters = parameters;
@@ -60,7 +60,7 @@ namespace Monitor.Actors
             Receive<TriggerMessage>(m =>
             {
                 StartMeasure();
-                _dnsRequest.GetHostEntry(_parameters.Hostname)
+                _dnsRequest.GetHostEntry(_parameters.Identifier)
                         .ContinueWith(t =>
                         {
                             StopMeasure();
@@ -93,12 +93,12 @@ namespace Monitor.Actors
             Receive<TriggerMessage>(m =>
             {
                 StartMeasure();
-                _dnsRequest.GetHostEntry(_parameters.Hostname)
+                _dnsRequest.GetHostEntry(_parameters.Identifier)
                         .ContinueWith(t =>
                         {
                             StopMeasure();
                             if (t.IsCompletedSuccessfully)
-                                return new RevokeAlertMessage($"DNS hostname: {_parameters.Hostname} resolved.");
+                                return new RevokeAlertMessage($"DNS hostname: {_parameters.Identifier} resolved.");
                             return new RevokeAlertMessage();
                         }, TaskContinuationOptions.AttachedToParent & TaskContinuationOptions.ExecuteSynchronously)
                         .PipeTo(Self);

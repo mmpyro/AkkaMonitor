@@ -1,74 +1,60 @@
+using Monitor.Enums;
+
 namespace Monitor.Messages
 {
-    public class CreateMonitorMessage {
-        public int CheckInterval { get; private set; }
+    public abstract class CreateMonitorMessage {
+        public int CheckInterval { get; }
 
-        public CreateMonitorMessage(int checkInterval)
+        public int Id => GetHashCode();
+
+        public string Name { get; }  
+
+        public string Identifier { get; }
+
+        public abstract MonitorType Type { get; }
+
+        public CreateMonitorMessage(string name, string identifier, int checkInterval)
         {
             CheckInterval = checkInterval;
+            Identifier = identifier;
+            Name = $"{name}-{Type}";
+        }
+
+        public override int GetHashCode()
+        {
+            return Name.GetHashCode();
+        }
+
+        public override string ToString()
+        {
+            return Name;
+        }
+
+        public override bool Equals(object obj)
+        {
+            var monitor = obj as CreateMonitorMessage;
+            return monitor != null ? monitor.Name == Name : false;
         }
     }
 
     public class CreateDnsMonitorMessage : CreateMonitorMessage
     {
-        public CreateDnsMonitorMessage(string hostName, int checkInterval) : base(checkInterval)
+        public CreateDnsMonitorMessage(string name, string hostName, int checkInterval) : base(name, hostName, checkInterval)
         {
-            Hostname = hostName;
         }
 
-        public string Hostname { get; private set; }
-
-        public override int GetHashCode()
-        {
-            return Hostname.GetHashCode();
-        }
-
-        public override string ToString()
-        {
-            return Hostname;
-        }
-
-        public override bool Equals(object obj)
-        {
-            var message = obj as CreateDnsMonitorMessage;
-            if(message != null)
-            {
-                return message.Hostname == Hostname;
-            }
-            return false;
-        }
+        public override MonitorType Type => MonitorType.DNS;
     }
 
     public class CreateHttpMonitorMessage : CreateMonitorMessage
     {
-        public CreateHttpMonitorMessage(string url, int expectedStatusCode, int checkInterval) : base(checkInterval)
+        public CreateHttpMonitorMessage(string name, string url, int expectedStatusCode, int checkInterval) : base(name, url, checkInterval)
         {
-            Url = url;
             ExpectedStatusCode = expectedStatusCode;
         }
 
-        public string Url { get; private set; }
-
         public int ExpectedStatusCode { get; set; }
 
-        public override bool Equals(object obj)
-        {
-            var message = obj as CreateHttpMonitorMessage;
-            if(message != null)
-            {
-                return message.Url == Url;
-            }
-            return false;
-        }
-
-        public override int GetHashCode()
-        {
-            return Url.GetHashCode();
-        }
-
-        public override string ToString()
-        {
-            return Url;
-        }
+        public override MonitorType Type => MonitorType.Http;
     }
 }

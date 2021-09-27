@@ -1,3 +1,5 @@
+using System;
+
 namespace Monitor.Messages
 {
     public class CreateAlertMessage {}
@@ -10,8 +12,8 @@ namespace Monitor.Messages
             Channel = channel;
         }
 
-        public string Url { get; private set; }
-        public string Channel { get; private set; }
+        public string Url { get;}
+        public string Channel { get;}
 
         public override bool Equals(object obj)
         {
@@ -25,7 +27,7 @@ namespace Monitor.Messages
 
         public override int GetHashCode()
         {
-            return Url.GetHashCode()+Channel.GetHashCode();
+            return HashCode.Combine(Url.GetHashCode(),Channel.GetHashCode());
         }
     }
 }

@@ -13,9 +13,9 @@ namespace Monitor
     public class ConfigurationParser : IConfigurationParser
     {
         private const int DEFAULT_INTERVAL = 15;
-        private readonly IConfigurationRoot _configuration;
+        private readonly IConfiguration _configuration;
         
-        public ConfigurationParser(IConfigurationRoot configuration)
+        public ConfigurationParser(IConfiguration configuration)
         {
             _configuration = configuration;
         }
@@ -40,10 +40,10 @@ namespace Monitor
                     {
                         case "Http":
                             int expectedStatusCode = int.Parse(monitor["ExpectedStatusCode"]);
-                            yield return new CreateHttpMonitorMessage(monitor["Url"], expectedStatusCode, CheckInterval(monitor["CheckInterval"]));
+                            yield return new CreateHttpMonitorMessage(monitor["Name"], monitor["Url"], expectedStatusCode, CheckInterval(monitor["CheckInterval"]));
                             break;
                         case "DNS":
-                            yield return new CreateDnsMonitorMessage(monitor["Hostname"], CheckInterval(monitor["CheckInterval"]));
+                            yield return new CreateDnsMonitorMessage(monitor["Name"], monitor["Hostname"], CheckInterval(monitor["CheckInterval"]));
                             break;
                         default:
                             break;

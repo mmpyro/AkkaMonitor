@@ -107,11 +107,13 @@ data:
             {
                 "Type": "Slack",
                 "SlackChannel": "#akka",
-                "SlackUrl": ""
+                "SlackUrl": "https://hooks.slack.com/services/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"
             }
         ]
     }
 kind: ConfigMap
 metadata:
+  labels:
+    app: akka-monitor
   namespace: monitoring
   name: appsettings-v001

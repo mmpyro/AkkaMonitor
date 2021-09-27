@@ -1,5 +1,6 @@
 
 
+using Akka.Actor;
 using Monitor.Extensions;
 using Monitor.Messages;
 
@@ -28,6 +29,11 @@ namespace Monitor.Actors
         {
             base.PreStart();
             Self.Tell(new LoadConfigurationMessage(), Self);
+        }
+
+        public static Props Create(IConfigurationParser configurationParser)
+        {
+            return Props.Create(() => new ConfigurationActor(configurationParser));
         }
     }
 }
