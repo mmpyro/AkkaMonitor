@@ -7,4 +7,13 @@ GET {{api}}/monitor
 GET {{api}}/monitor/google-Http
 
 ### GET invalid monitor
-GET {{api}}/monitor/google2-Http
+GET {{api}}/monitor/google-Http
+
+### DELETE monitor
+DELETE {{api}}/monitor/google-Http
+
+### GET alerts
+GET {{api}}/alert
+
+### GET alerts
+GET {{api}}/alert/slack-Slack

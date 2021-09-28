@@ -25,6 +25,10 @@ namespace Monitor.Actors
                 Receive<TriggerAlertCancelationMessage>(m => {
                     _slackClient.PostMessage(m.Content, SLACK_USER, parameters.Channel);
                 });
+
+                Receive<AlertDetailsMessageReq>(m => {
+                    Sender.Tell(new AlertDetailsMessageRes(parameters.Name, parameters.Type, new { Url = parameters.Url, Channel = parameters.Channel}));
+                });
             }
             catch(UriFormatException ex)
             {

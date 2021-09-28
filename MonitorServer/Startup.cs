@@ -18,6 +18,7 @@ namespace MonitorServer
     public class Startup
     {
         public delegate IActorRef MonitorManagerActorProvider();
+        public delegate IActorRef AlertManagerActorProvider();
 
         public Startup(IConfiguration configuration)
         {
@@ -40,8 +41,6 @@ namespace MonitorServer
             services.AddScoped<IConfigurationParser, ConfigurationParser>();
             services.AddScoped<IActorFactory, ActorFactory>();
             var sp = services.BuildServiceProvider();
-            var server = new MetricServer(port: 8082);
-            server.Start();
 
             var system = ActorSystem.Create("Monitor", LoadActorSystemConfig());
             var monitorManager = system.ActorOf(MonitorManagerActor.Create(sp.GetService<IActorFactory>()), nameof(MonitorManagerActor));
@@ -52,6 +51,10 @@ namespace MonitorServer
             services.AddSingleton<MonitorManagerActorProvider>(provider =>
             {
                return () => monitorManager;
+            });
+            services.AddSingleton<AlertManagerActorProvider>(provider =>
+            {
+                return () => alertManager;
             });
         }
 
@@ -74,6 +77,7 @@ namespace MonitorServer
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapMetrics();
             });
         }
 
