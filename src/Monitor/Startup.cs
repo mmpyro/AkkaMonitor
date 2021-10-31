@@ -21,6 +21,7 @@ namespace Monitor
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "MonitorServer", Version = "v1" });
             });
+            services.AddAutoMapper(typeof(MonitorProfile));
             services.AddTransient<IRequestFactory, RequestFactory>();
             services.AddTransient<ISlackClientFactory, SlackClientFactory>();
             services.AddTransient<IConfigurationParser, ConfigurationParser>();

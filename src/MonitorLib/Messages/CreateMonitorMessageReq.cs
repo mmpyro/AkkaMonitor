@@ -1,6 +1,4 @@
 using MonitorLib.Enums;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace MonitorLib.Messages
 {
@@ -14,10 +12,8 @@ namespace MonitorLib.Messages
 
         public string Identifier { get; }
 
-        [JsonConverter(typeof(StringEnumConverter))]
         public MonitorMode Mode { get; }
 
-        [JsonConverter(typeof(StringEnumConverter))]
         public abstract MonitorType Type { get; }
 
         public CreateMonitorMessageReq(string name, string identifier, int interval, MonitorMode mode)

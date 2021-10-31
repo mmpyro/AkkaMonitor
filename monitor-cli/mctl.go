@@ -14,20 +14,20 @@ import (
 )
 
 type MonitorInfo struct {
-	Name       string `json:"Name"`
-	Identifier string `json:"Identifier"`
-	Type       string `json:"Type"`
-	Interval   int    `json:"Interval"`
-	Mode       string `json:"Mode"`
+	Name       string `json:"name"`
+	Identifier string `json:"identifier"`
+	Type       string `json:"type"`
+	Interval   int    `json:"interval"`
+	Mode       string `json:"mode"`
 }
 
 type MonitorStatus struct {
-	Name       string `json:"Name"`
-	Identifier string `json:"Identifier"`
-	Type       string `json:"Type"`
-	Interval   int    `json:"Interval"`
-	Mode       string `json:"Mode"`
-	State      string `json:"State"`
+	Name       string `json:"name"`
+	Identifier string `json:"identifier"`
+	Type       string `json:"type"`
+	Interval   int    `json:"interval"`
+	Mode       string `json:"mode"`
+	State      string `json:"state"`
 }
 
 type MonitorDisplay interface {
@@ -35,11 +35,11 @@ type MonitorDisplay interface {
 }
 
 type HttpMonitor struct {
-	Name               string `json:"Name"`
-	Url                string `json:"Url"`
-	Interval           int    `json:"Interval"`
-	Mode               string `json:"Mode"`
-	ExpectedStatusCode int    `json:"ExpectedStatusCode"`
+	Name               string `json:"name"`
+	Url                string `json:"url"`
+	Interval           int    `json:"interval"`
+	Mode               string `json:"mode"`
+	ExpectedStatusCode int    `json:"expectedStatusCode"`
 }
 
 func (m HttpMonitor) Display() string {
@@ -47,10 +47,10 @@ func (m HttpMonitor) Display() string {
 }
 
 type DnsMonitor struct {
-	Name     string `json:"Name"`
-	Hostname string `json:"Hostname"`
-	Interval int    `json:"Interval"`
-	Mode     string `json:"Mode"`
+	Name     string `json:"name"`
+	Hostname string `json:"hostname"`
+	Interval int    `json:"interval"`
+	Mode     string `json:"mode"`
 }
 
 func (m DnsMonitor) Display() string {

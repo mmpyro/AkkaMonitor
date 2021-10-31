@@ -13,6 +13,7 @@ namespace MonitorLib.Dtos
         }
 
         public string Name { get; }
+
         [JsonConverter(typeof(StringEnumConverter))]
         public AlertType Type { get; }
     }

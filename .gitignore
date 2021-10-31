@@ -307,3 +307,6 @@ __pycache__/
 *.btm.cs
 *.odx.cs
 *.xsd.cs
+
+#golang cli
+monitor-cli/mctl.exe

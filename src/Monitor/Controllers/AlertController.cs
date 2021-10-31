@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Monitor;
-using MonitorLib.Actors;
 using MonitorLib.Dtos;
 using MonitorLib.Messages;
 using System.Collections.Generic;
@@ -14,11 +14,13 @@ namespace MonitorServer.Controllers
     public class AlertController : ControllerBase
     {
         private readonly ILogger<AlertController> _logger;
-        private readonly IMonitorController _monitorManager;
+        private readonly IMonitorController _monitorController;
+        private readonly IMapper _mapper;
 
-        public AlertController(IMonitorController monitorManager, ILogger<AlertController> logger)
+        public AlertController(IMonitorController monitorController, IMapper mapper, ILogger<AlertController> logger)
         {
-            _monitorManager = monitorManager;
+            _monitorController = monitorController;
+            _mapper = mapper;
             _logger = logger;
         }
 
@@ -26,7 +28,7 @@ namespace MonitorServer.Controllers
         public ActionResult DeleteAlert(string name)
         {
             _logger.LogDebug($"Delete alert {name}.");
-            _monitorManager.DeleteAlert(name);
+            _monitorController.DeleteAlert(name);
             return NoContent();
         }
 
@@ -34,29 +36,37 @@ namespace MonitorServer.Controllers
         public async Task<IEnumerable<AlertInfo>> Get()
         {
             _logger.LogDebug("Get alerts");
-            var res = await _monitorManager.ListAlerts();
+            var res = await _monitorController.ListAlerts();
             return res;
         }
 
         [HttpGet("{name}")]
-        public async Task<ActionResult<AlertDetailsMessageRes>> GetAlertInfo(string name)
+        public async Task<ActionResult<AlertDetails>> GetAlertInfo(string name)
         {
             _logger.LogDebug($"Get alert details for: {name}");
-            var res = await _monitorManager.GetAlertInfo(name);
+            var res = await _monitorController.GetAlertInfo(name);
             if (res == null)
             {
                 return NotFound($"Alert {name} doesn't exists.");
             }
-            return res;
+            return _mapper.Map<AlertDetailsMessageRes, AlertDetails>(res);
         }
 
         [HttpPost("slack")]
-        public async Task<ActionResult> CreateAlert([FromBody] CreateSlackAlertMessage data)
+        public async Task<ActionResult> CreateAlert([FromBody] SlackAlert data)
         {
-            var res = await _monitorManager.CreateAlert(data);
-            if (res != null)
-                return Ok($"Alert {res.Name} created.");
-            return BadRequest($"Alert wasn't created for request {data}.");
+            try
+            {
+                var msg = _mapper.Map<SlackAlert, CreateSlackAlertMessage>(data);
+                var res = await _monitorController.CreateAlert(msg);
+                if (res != null)
+                    return Ok($"Alert {res.Name} created.");
+                return BadRequest($"Alert wasn't created for request {data}.");
+            }
+            catch(AutoMapperMappingException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

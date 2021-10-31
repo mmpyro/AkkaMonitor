@@ -14,7 +14,6 @@ namespace MonitorLib.Messages
 
         public string Name { get; }
         public AlertType Type { get; }
-
         public object Parameters { get; }
     }
 }

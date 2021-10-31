@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Monitor;
@@ -15,13 +16,15 @@ namespace MonitorServer.Controllers
     public class MonitorController : ControllerBase
     {
         private readonly ILogger<MonitorController> _logger;
-        private readonly IMonitorController _monitorManager;
+        private readonly IMonitorController _monitorController;
         private readonly IMonitorCreationValidator _validator;
+        private readonly IMapper _mapper;
 
-        public MonitorController(IMonitorController monitorManager, IMonitorCreationValidator validator, ILogger<MonitorController> logger)
+        public MonitorController(IMonitorController monitorController, IMonitorCreationValidator validator, IMapper mapper, ILogger<MonitorController> logger)
         {
-            _monitorManager = monitorManager;
+            _monitorController = monitorController;
             _validator = validator;
+            _mapper = mapper;
             _logger = logger;
         }
 
@@ -29,7 +32,7 @@ namespace MonitorServer.Controllers
         public async Task<IEnumerable<MonitorInfo>> Get()
         {
             _logger.LogDebug("Get monitors");
-            var res = await _monitorManager.ListMonitors();
+            var res = await _monitorController.ListMonitors();
             return res;
         }
 
@@ -49,33 +52,38 @@ namespace MonitorServer.Controllers
         public ActionResult DeleteMonitor(string name)
         {
             _logger.LogDebug($"Delete monitor {name}.");
-            _monitorManager.DeleteMonitor(name);
+            _monitorController.DeleteMonitor(name);
             return NoContent();
         }
 
         [HttpPost("http")]
-        public async Task<ActionResult> CreateHttpMonitor([FromBody] CreateHttpMonitorMessage data)
+        public async Task<ActionResult> CreateHttpMonitor([FromBody] HttpMonitor data)
         {
-            return await CreateMonitor(data);
+            return await CreateMonitor<CreateHttpMonitorMessage>(data);
         }
 
         [HttpPost("dns")]
-        public async Task<ActionResult> CreateDnsMonitor([FromBody] CreateDnsMonitorMessage data)
+        public async Task<ActionResult> CreateDnsMonitor([FromBody] DnsMonitor data)
         {
-            return await CreateMonitor(data);
+            return await CreateMonitor<CreateDnsMonitorMessage>(data);
         }
 
-        private async Task<ActionResult> CreateMonitor(CreateMonitorMessageReq data)
+        private async Task<ActionResult> CreateMonitor<T>(object data) where T : CreateMonitorMessageReq
         {
             try
             {
-                _validator.Validate(data);
-                var res = await _monitorManager.CreateMonitor(data);
+                var msg = _mapper.Map<T>(data);
+                _validator.Validate(msg);
+                var res = await _monitorController.CreateMonitor(msg);
                 if (res != null)
                     return Ok($"Monitor {res.Name} created.");
                 return BadRequest($"Monitor wasn't created for request {data}.");
             }
             catch(ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch(AutoMapperMappingException ex)
             {
                 return BadRequest(ex.Message);
             }

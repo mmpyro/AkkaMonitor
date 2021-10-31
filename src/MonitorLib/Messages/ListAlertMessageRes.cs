@@ -1,5 +1,4 @@
-﻿using MonitorLib.Actors;
-using MonitorLib.Dtos;
+﻿using MonitorLib.Dtos;
 using System.Collections.ObjectModel;
 
 namespace MonitorLib.Messages

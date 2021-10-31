@@ -112,7 +112,7 @@ namespace Monitor
 
         public async Task<AlertDetailsMessageRes> GetAlertInfo(string name)
         {
-            return await _monitorManager.Ask<AlertDetailsMessageRes>(new AlertDetailsMessageReq(name));
+            return await _alertManager.Ask<AlertDetailsMessageRes>(new AlertDetailsMessageReq(name));
         }
 
         public void DeleteAlert(string name)
