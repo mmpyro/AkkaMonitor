@@ -18,7 +18,7 @@ spec:
         app: akka-monitor
     spec:
       containers:
-      - image: michalmarszalek/akka-monitor:1.2
+      - image: michalmarszalek/akka-monitor:1.3
         imagePullPolicy: IfNotPresent
         name: monitor
         ports:
@@ -32,7 +32,7 @@ spec:
             memory: "1Gi"
         volumeMounts:
         - name: config
-          mountPath: "/home/app/config"
+          mountPath: "/home/app/Config"
           readOnly: true
       volumes:
       - name: config
@@ -58,3 +58,27 @@ spec:
   type: ClusterIP
 status:
   loadBalancer: {}
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: monitor-network-policy
+  namespace: monitoring
+spec:
+  podSelector:
+    matchLabels:
+      app: akka-monitor
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: prometheus
+    ports:
+    - protocol: TCP
+      port: 8082
+  egress:
+  - {}

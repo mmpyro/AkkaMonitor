@@ -1,5 +1,0 @@
-config
-bin
-out
-Dockerfile
-.dockerignore
