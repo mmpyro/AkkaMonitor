@@ -66,10 +66,12 @@ namespace MonitorLib.Actors
                 Sender.Tell(response);
             });
 
-            Receive<MonitorStatusMessageReq>(m => {
+            ReceiveAsync<MonitorStatusMessageReq>(async m =>
+            {
                 if (_actors.TryGetValue(m.Name.GetHashCode(), out MonitorActorRef actor) && actor?.ActorRef != null)
                 {
-                    actor.ActorRef.Forward(m);
+                    var res = await actor.ActorRef.Ask<MonitorStatusMessageRes>(new MonitorStatusMessageReq(m.Name));
+                    Sender.Tell(res);
                 }
                 else
                 {

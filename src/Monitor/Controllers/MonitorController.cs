@@ -36,17 +36,17 @@ namespace MonitorServer.Controllers
             return res;
         }
 
-        //[HttpGet("{name}")]
-        //public async Task<ActionResult<MonitorStatusMessageRes>> GetMonitorInfo(string name)
-        //{
-        //    _logger.LogDebug($"Get monitor status for: {name}");
-        //    var res = await _monitorManager.GetMonitorInfo(name);
-        //    if(res == null)
-        //    {
-        //        return NotFound($"Monitor {name} doesn't exists.");
-        //    }
-        //    return res;
-        //}
+        [HttpGet("{name}")]
+        public async Task<ActionResult<MonitorStatus>> GetMonitorInfo(string name)
+        {
+            _logger.LogDebug($"Get monitor status for: {name}");
+            var res = await _monitorController.GetMonitorInfo(name);
+            if (res == null)
+            {
+                return NotFound($"Monitor {name} doesn't exists.");
+            }
+            return _mapper.Map<MonitorStatus>(res);
+        }
 
         [HttpDelete("{name}")]
         public ActionResult DeleteMonitor(string name)

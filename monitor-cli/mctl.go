@@ -138,7 +138,7 @@ func main() {
 	url := parser.String("e", "endpoint", &argparse.Options{
 		Required: false,
 		Help:     "Url of monitor server.",
-		Default:  "https://localhost:5001/api/v1/Monitor",
+		Default:  "http://localhost:5000/api/v1/Monitor",
 	})
 	commandMonitor := parser.NewCommand("monitor", "")
 	monitorList := commandMonitor.NewCommand("list", "List monitors")

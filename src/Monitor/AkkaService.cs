@@ -96,7 +96,8 @@ namespace Monitor
 
         public async Task<MonitorStatusMessageRes> GetMonitorInfo(string name)
         {
-            return await _monitorManager.Ask<MonitorStatusMessageRes>(new MonitorStatusMessageReq(name));
+            var res = await _monitorManager.Ask<MonitorStatusMessageRes>(new MonitorStatusMessageReq(name));
+            return res;
         }
 
         public void DeleteMonitor(string name)

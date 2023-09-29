@@ -19,6 +19,8 @@ namespace Monitor
                 .ForMember(dest => dest.Type, opt => opt.MapFrom(_ => AlertType.Slack));
 
             CreateMap<AlertDetailsMessageRes, AlertDetails>();
+
+            CreateMap<MonitorStatusMessageRes, MonitorStatus>();
         }
     }
 }

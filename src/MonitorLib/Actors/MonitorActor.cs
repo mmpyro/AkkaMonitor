@@ -59,9 +59,10 @@ namespace MonitorLib.Actors
             _monitorState = MonitorState.Failed;
             UpdateMonitorState();
             RequestReschedule();
-            //Receive<MonitorStatusMessageReq>(m => {
-            //    Sender.Tell(new MonitorStatusMessageRes(_monitorName, _checkInterval, _identifier, _monitorType, _monitorMode, MonitorState.Failed));
-            //});
+            Receive<MonitorStatusMessageReq>(m =>
+            {
+                Sender.Tell(new MonitorStatusMessageRes(_monitorName, _checkInterval, _identifier, _monitorType, _monitorMode, MonitorState.Failed));
+            });
         }
 
         protected virtual void Success()
@@ -69,9 +70,10 @@ namespace MonitorLib.Actors
             Log.Info("Become Success");
             _monitorState = MonitorState.Success;
             UpdateMonitorState();
-            //Receive<MonitorStatusMessageReq>(m => {
-            //    Sender.Tell(new MonitorStatusMessageRes(_monitorName, _checkInterval, _identifier, _monitorType, _monitorMode, MonitorState.Success));
-            //});
+            Receive<MonitorStatusMessageReq>(m =>
+            {
+                Sender.Tell(new MonitorStatusMessageRes(_monitorName, _checkInterval, _identifier, _monitorType, _monitorMode, MonitorState.Success));
+            });
         }
 
         protected override void PreStart()
