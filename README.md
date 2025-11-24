@@ -43,3 +43,33 @@ To build the Docker image manually:
 ```bash
 docker build -t akka-monitor .
 ```
+
+## Running Tests
+
+### Integration Tests
+
+Run integration tests for the Monitor API:
+
+```bash
+docker run --rm -v $(pwd):/app -w /app/src/Monitor.IntegrationTests mcr.microsoft.com/dotnet/sdk:8.0 dotnet test
+```
+
+### Unit Tests
+
+Run unit tests for MonitorLib:
+
+```bash
+docker run --rm -v $(pwd):/app -w /app/src/MonitorLib.Tests mcr.microsoft.com/dotnet/sdk:8.0 dotnet test
+```
+
+Run unit tests for Monitor:
+
+```bash
+docker run --rm -v $(pwd):/app -w /app/src/Monitor.Tests mcr.microsoft.com/dotnet/sdk:8.0 dotnet test
+```
+
+Or run all tests:
+
+```bash
+docker run --rm -v $(pwd):/app -w /app mcr.microsoft.com/dotnet/sdk:8.0 dotnet test
+```
