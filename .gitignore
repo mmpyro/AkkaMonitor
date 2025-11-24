@@ -308,5 +308,10 @@ __pycache__/
 *.odx.cs
 *.xsd.cs
 
-#golang cli
+# Go binaries
+monitor-cli/mctl
 monitor-cli/mctl.exe
+monitor-cli/mctl-linux
+monitor-cli/mctl-macos
+monitor-cli/mctl-windows
+monitor-cli/mctl-*

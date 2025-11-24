@@ -71,5 +71,63 @@ docker run --rm -v $(pwd):/app -w /app/src/Monitor.Tests mcr.microsoft.com/dotne
 Or run all tests:
 
 ```bash
+```bash
 docker run --rm -v $(pwd):/app -w /app mcr.microsoft.com/dotnet/sdk:8.0 dotnet test
 ```
+
+## Using the CLI
+
+The `monitor-cli` provides a command-line interface for managing monitors and alerts.
+
+### Building the CLI
+
+```bash
+cd monitor-cli
+go build -o mctl
+```
+
+### Quick Start
+
+```bash
+# List all monitors
+./mctl monitor list
+
+# Create an HTTP monitor
+./mctl monitor create http -n WebsiteMonitor -u https://example.com -i 60
+
+# Create a DNS monitor
+./mctl monitor create dns -n DNSMonitor -a 8.8.8.8 -i 30
+
+# Get monitor status
+./mctl monitor info -n WebsiteMonitor-Http
+
+# List all alerts
+./mctl alert list
+
+# Create a Slack alert
+./mctl alert create slack -n ProductionAlert -u https://hooks.slack.com/services/XXX -c "#alerts"
+
+# Delete a monitor
+./mctl monitor delete -n WebsiteMonitor-Http
+```
+
+For detailed CLI documentation, see [`monitor-cli/README.md`](monitor-cli/README.md).
+
+## API Endpoints
+
+The Monitor API provides the following endpoints:
+
+### Monitors
+- `GET /api/v1/monitor` - List all monitors
+- `GET /api/v1/monitor/{name}` - Get monitor status
+- `DELETE /api/v1/monitor/{name}` - Delete a monitor
+- `POST /api/v1/monitor/http` - Create HTTP monitor
+- `POST /api/v1/monitor/dns` - Create DNS monitor
+
+### Alerts
+- `GET /api/v1/alert` - List all alerts
+- `GET /api/v1/alert/{name}` - Get alert details
+- `DELETE /api/v1/alert/{name}` - Delete an alert
+- `POST /api/v1/alert/slack` - Create Slack alert
+
+Swagger documentation is available at `http://localhost:8080/swagger` when running the application.
