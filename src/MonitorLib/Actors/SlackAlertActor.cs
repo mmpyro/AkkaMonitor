@@ -1,5 +1,6 @@
 using System;
 using Akka.Actor;
+using Akka.Event;
 using MonitorLib.Clients;
 using MonitorLib.Factories;
 using MonitorLib.Messages;

@@ -1,4 +1,5 @@
 using Akka.Actor;
+using Akka.Event;
 using MonitorLib.Enums;
 using MonitorLib.Messages;
 using Prometheus;

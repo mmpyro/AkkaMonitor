@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using Akka.Actor;
+using Akka.Event;
 using MonitorLib.Enums;
 using MonitorLib.Messages;
 using InitParamaters = MonitorLib.Messages.CreateMonitorMessageReq;

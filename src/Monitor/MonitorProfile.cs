@@ -10,10 +10,12 @@ namespace Monitor
         public MonitorProfile()
         {
             CreateMap<HttpMonitor, CreateHttpMonitorMessage>()
-                .ForMember(dest => dest.Type, opt => opt.MapFrom(_ => MonitorType.Http));
+                .ForMember(dest => dest.Type, opt => opt.MapFrom(_ => MonitorType.Http))
+                .ForMember(dest => dest.Identifier, opt => opt.MapFrom(src => src.Url));
 
             CreateMap<DnsMonitor, CreateDnsMonitorMessage>()
-                .ForMember(dest => dest.Type, opt => opt.MapFrom(_ => MonitorType.DNS));
+                .ForMember(dest => dest.Type, opt => opt.MapFrom(_ => MonitorType.DNS))
+                .ForMember(dest => dest.Identifier, opt => opt.MapFrom(src => src.Hostname));
 
             CreateMap<SlackAlert, CreateSlackAlertMessage>()
                 .ForMember(dest => dest.Type, opt => opt.MapFrom(_ => AlertType.Slack));
