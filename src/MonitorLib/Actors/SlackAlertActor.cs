@@ -19,10 +19,12 @@ namespace MonitorLib.Actors
                 _slackClient = slackClientFactory.Create(parameters.Url);
 
                 Receive<TriggerAlertMessage>(m => {
+                    Log.Info($"Sending TriggerAlertMessage");
                     _slackClient.PostMessage(m.Content, SLACK_USER, parameters.Channel);
                 });
 
                 Receive<TriggerAlertCancelationMessage>(m => {
+                    Log.Info($"Sending TriggerAlertCancelationMessage");
                     _slackClient.PostMessage(m.Content, SLACK_USER, parameters.Channel);
                 });
 
@@ -32,7 +34,7 @@ namespace MonitorLib.Actors
             }
             catch(UriFormatException ex)
             {
-                Log.Error(ex, $"Exception during {nameof(SlackAlertActor)} actor creation. Invalid slack url. Actor is stoped.");
+                Log.Info(ex, $"Become Failed. Exception during {nameof(SlackAlertActor)} actor creation. Invalid slack url. Actor is stopped.");
                 Context.Parent.Tell(new DeleteActorMessage(parameters.GetHashCode()));
             }
         }

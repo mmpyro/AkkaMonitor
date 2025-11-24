@@ -47,7 +47,7 @@ namespace MonitorLib.Actors
                 {
                     var selection = Context.System.ActorSelection(ALERT_MANAGER);
                     selection.Tell(new TriggerAlertMessage(m.Content));
-                    Log.Info("Sending TriggerAlertMessage");
+                    Log.Info($"Sending TriggerAlertMessage");
                     Become(Failed);
                 }
                 else
@@ -84,7 +84,7 @@ namespace MonitorLib.Actors
                 {
                     var selection = Context.System.ActorSelection(ALERT_MANAGER);
                     selection.Tell(new TriggerAlertCancelationMessage(m.Content));
-                    Log.Info("Sending TriggerAlertCancelationMessage");
+                    Log.Info($"Sending TriggerAlertCancelationMessage");
                     Become(Success);
                 }
             });

@@ -55,7 +55,7 @@ namespace MonitorLib.Actors
 
         protected virtual void Failed()
         {
-            Log.Info("Become Failed");
+            Log.Info($"Become Failed");
             _monitorState = MonitorState.Failed;
             UpdateMonitorState();
             RequestReschedule();
@@ -67,7 +67,7 @@ namespace MonitorLib.Actors
 
         protected virtual void Success()
         {
-            Log.Info("Become Success");
+            Log.Info($"Become Success");
             _monitorState = MonitorState.Success;
             UpdateMonitorState();
             Receive<MonitorStatusMessageReq>(m =>

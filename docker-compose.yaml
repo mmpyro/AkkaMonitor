@@ -11,4 +11,4 @@ services:
       - "9110:9110"
       - "4055:4055"
     environment:
-      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_ENVIRONMENT=Development
