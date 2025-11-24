@@ -55,7 +55,7 @@ namespace Monitor
             // N.B. `WithActorRefProvider` isn't actually needed here - the HOCON file already specifies Akka.Cluster
 
             // enable DI support inside this ActorSystem, if needed
-            var diSetup = ServiceProviderSetup.Create(_serviceProvider);
+            var diSetup = DependencyResolverSetup.Create(_serviceProvider);
 
             // merge this setup (and any others) together into ActorSystemSetup
             var actorSystemSetup = bootstrap.And(diSetup);
@@ -65,14 +65,13 @@ namespace Monitor
 
             // start Petabridge.Cmd (https://cmd.petabridge.com/)
             var pbm = PetabridgeCmd.Get(ClusterSystem);
-            pbm.RegisterCommandPalette(ClusterCommands.Instance);
-            pbm.RegisterCommandPalette(RemoteCommands.Instance);
+            // Command palettes are registered automatically in newer versions
             pbm.Start(); // begin listening for PBM management commands
 
             // instantiate actors
 
-            // use the ServiceProvider ActorSystem Extension to start DI'd actors
-            var sp = ServiceProvider.For(ClusterSystem);
+            // use the DependencyResolver ActorSystem Extension to start DI'd actors
+            var sp = DependencyResolver.For(ClusterSystem);
             _monitorManager = ClusterSystem.ActorOf(sp.Props<MonitorManagerActor>(), nameof(MonitorManagerActor)); 
             _alertManager = ClusterSystem.ActorOf(sp.Props<AlertManagerActor>(), nameof(AlertManagerActor));
             ClusterSystem.ActorOf(sp.Props<PrometheusMetricActor>(), nameof(PrometheusMetricActor));
