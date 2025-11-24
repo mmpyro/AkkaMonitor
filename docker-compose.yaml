@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  akka-monitor:
+    container_name: akka-monitor
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+      - "9110:9110"
+      - "4055:4055"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
