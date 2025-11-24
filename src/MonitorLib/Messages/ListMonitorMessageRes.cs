@@ -1,15 +1,7 @@
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
 using MonitorLib.Dtos;
 
 namespace MonitorLib.Messages
 {
-
-    public class ListMonitorMessageRes
-    {
-        public ListMonitorMessageRes(ReadOnlyCollection<MonitorInfo> monitors)
-        {
-            Monitors = monitors; 
-        }
-        public ReadOnlyCollection<MonitorInfo> Monitors { get; }
-    }
+    public record ListMonitorMessageRes(IEnumerable<MonitorInfo> Monitors);
 }

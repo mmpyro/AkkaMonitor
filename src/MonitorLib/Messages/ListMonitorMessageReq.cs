@@ -1,4 +1,4 @@
 ﻿namespace MonitorLib.Messages
 {
-    public class ListMonitorMessageReq {}
+    public record ListMonitorMessageReq;
 }

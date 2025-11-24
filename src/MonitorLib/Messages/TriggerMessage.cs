@@ -1,7 +1,4 @@
 namespace MonitorLib.Messages
 {
-    public class TriggerMessage
-    {
-
-    }
+    public record TriggerMessage;
 }

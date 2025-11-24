@@ -1,7 +1,4 @@
 namespace MonitorLib.Messages
 {
-    public class LoadConfigurationMessage
-    {
-        
-    }
+    public record LoadConfigurationMessage;
 }

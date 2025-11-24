@@ -1,11 +1,4 @@
 namespace MonitorLib.Messages
 {
-    public class TriggerAlertMessage
-    {
-        public TriggerAlertMessage(string content)
-        {
-            Content = content;
-        }
-        public string Content { get; private set; }
-    }
+    public record TriggerAlertMessage(string Content);
 }

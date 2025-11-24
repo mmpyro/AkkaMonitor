@@ -1,16 +1,7 @@
 ﻿using MonitorLib.Dtos;
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
 
 namespace MonitorLib.Messages
 {
-
-    public class ListAlertMessageRes
-    {
-        public ListAlertMessageRes(ReadOnlyCollection<AlertInfo> alerts)
-        {
-            Alerts = alerts;
-        }
-
-        public ReadOnlyCollection<AlertInfo> Alerts { get; }
-    }
+    public record ListAlertMessageRes(IEnumerable<AlertInfo> Alerts);
 }
