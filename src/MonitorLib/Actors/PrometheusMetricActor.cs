@@ -18,17 +18,14 @@ namespace MonitorLib.Actors
             _monitorLattency = Metrics.CreateSummary("monitor_lattency", "Monitor lattency", new SummaryConfiguration {LabelNames = _monitor_labels});
 
             Receive<ActiveActorMetricMessage>(_ => {
-                Log.Info("Inc active actors");
                 _activeActors.Inc();
             });
 
             Receive<InactiveActorMetricMessage>(_ => {
-                Log.Info("Dec active actors");
                 _activeActors.Dec();
             });
 
             Receive<UpMonitorMetricMessage>(m => {
-                Log.Info($"Received {nameof(UpMonitorMetricMessage)} from [{m.Name}, {m.Type}, {m.Identifier}] with state {m.State}");
                 if(m.State == MonitorState.Success)
                     _alarmsUp.WithLabels(m.Labels).Set(1);
                 else if (m.State == MonitorState.Failed)
@@ -36,7 +33,6 @@ namespace MonitorLib.Actors
             });
 
             Receive<MonitorLattencyMessage>(m => {
-                Log.Info($"Received {nameof(MonitorLattencyMessage)} from [{m.Name}, {m.Type}, {m.Identifier}] with value {m.Value}"); 
                 _monitorLattency.WithLabels(m.Labels).Observe(m.Value);
             });
         }
