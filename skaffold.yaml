@@ -1,0 +1,16 @@
+apiVersion: skaffold/v4beta11
+kind: Config
+metadata:
+  name: akka-monitor
+build:
+  artifacts:
+  - image: michalmarszalek/akka-monitor
+    docker:
+      dockerfile: Dockerfile
+  local:
+    push: false
+manifests:
+  rawYaml:
+  - k8s/*.yaml
+deploy:
+  kubectl: {}
