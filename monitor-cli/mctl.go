@@ -319,10 +319,16 @@ func main() {
 	parser := argparse.NewParser("mctl", "AkkaMonitor CLI - Manage monitors and alerts")
 
 	// Global flags
+	defaultEndpoint := os.Getenv("MONITORING_ENDPOINT")
+	if defaultEndpoint == "" {
+		defaultEndpoint = "http://localhost:8080"
+	}
+
+	// Global flags
 	baseURL := parser.String("e", "endpoint", &argparse.Options{
 		Required: false,
 		Help:     "Base URL of the monitor server",
-		Default:  "http://localhost:8080",
+		Default:  defaultEndpoint,
 	})
 
 	// Monitor commands

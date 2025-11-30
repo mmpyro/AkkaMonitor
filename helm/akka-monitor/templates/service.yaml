@@ -1,0 +1,18 @@
+{{- if .Values.akkaMonitor.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.akkaMonitor.service.name }}
+  namespace: {{ include "akka-monitor.namespace" . }}
+  labels:
+    {{- include "akka-monitor.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.akkaMonitor.service.type }}
+  ports:
+  - port: {{ .Values.akkaMonitor.service.port }}
+    targetPort: {{ .Values.akkaMonitor.service.targetPort }}
+    protocol: TCP
+    name: prometheus
+  selector:
+    {{- include "akka-monitor.selectorLabels" . | nindent 4 }}
+{{- end }}

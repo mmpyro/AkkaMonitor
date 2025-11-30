@@ -1,0 +1,45 @@
+{{- if .Values.akkaMonitor.ingress.enabled -}}
+{{- $fullName := include "akka-monitor.fullname" . -}}
+{{- $svcName := .Values.akkaMonitor.service.name -}}
+{{- $svcPort := .Values.akkaMonitor.service.port -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ $fullName }}
+  namespace: {{ include "akka-monitor.namespace" . }}
+  labels:
+    {{- include "akka-monitor.labels" . | nindent 4 }}
+  {{- with .Values.akkaMonitor.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if .Values.akkaMonitor.ingress.className }}
+  ingressClassName: {{ .Values.akkaMonitor.ingress.className }}
+  {{- end }}
+  {{- if .Values.akkaMonitor.ingress.tls }}
+  tls:
+    {{- range .Values.akkaMonitor.ingress.tls }}
+    - hosts:
+        {{- range .hosts }}
+        - {{ . | quote }}
+        {{- end }}
+      secretName: {{ .secretName }}
+    {{- end }}
+  {{- end }}
+  rules:
+    {{- range .Values.akkaMonitor.ingress.hosts }}
+    - host: {{ .host | quote }}
+      http:
+        paths:
+          {{- range .paths }}
+          - path: {{ .path }}
+            pathType: {{ .pathType }}
+            backend:
+              service:
+                name: {{ $svcName }}
+                port:
+                  number: {{ $svcPort }}
+          {{- end }}
+    {{- end }}
+{{- end }}

@@ -1,0 +1,45 @@
+{{- if .Values.akkaMonitor.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "akka-monitor.fullname" . }}-config
+  namespace: {{ include "akka-monitor.namespace" . }}
+  labels:
+    {{- include "akka-monitor.labels" . | nindent 4 }}
+data:
+  appsettings.json: |-
+    {
+        "Monitors": [
+            {{- $monitorCount := len .Values.akkaMonitor.config.monitors }}
+            {{- range $i, $monitor := .Values.akkaMonitor.config.monitors }}
+            {
+                {{- if eq $monitor.type "Http" }}
+                "Type": "Http",
+                "Name": {{ $monitor.url | quote }},
+                "Url": {{ $monitor.url | quote }},
+                "ExpectedStatusCode": {{ $monitor.expectedStatusCode }},
+                "Interval": {{ $monitor.checkInterval | quote }},
+                "Mode": {{ default "Poke" $monitor.mode | quote }}
+                {{- else if eq $monitor.type "DNS" }}
+                "Type": "DNS",
+                "Name": {{ $monitor.hostname | quote }},
+                "Hostname": {{ $monitor.hostname | quote }},
+                "Interval": {{ $monitor.checkInterval | quote }},
+                "Mode": {{ default "Poke" $monitor.mode | quote }}
+                {{- end }}
+            }{{- if lt (add1 $i) $monitorCount }},{{- end }}
+            {{- end }}
+        ],
+        "Alerts": [
+            {{- $alertCount := len .Values.akkaMonitor.config.alerts }}
+            {{- range $i, $alert := .Values.akkaMonitor.config.alerts }}
+            {
+                "Type": {{ $alert.type | quote }},
+                "Name": {{ $alert.slackChannel | quote }},
+                "Channel": {{ $alert.slackChannel | quote }},
+                "Url": {{ $alert.slackUrl | quote }}
+            }{{- if lt (add1 $i) $alertCount }},{{- end }}
+            {{- end }}
+        ]
+    }
+{{- end }}

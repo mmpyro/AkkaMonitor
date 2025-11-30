@@ -3,14 +3,24 @@ kind: Config
 metadata:
   name: akka-monitor
 build:
+  # platforms: ["linux/amd64"]
   artifacts:
-  - image: michalmarszalek/akka-monitor
-    docker:
-      dockerfile: Dockerfile
+    - image: michalmarszalek/akka-monitor
+      docker:
+        dockerfile: Dockerfile
   local:
     push: false
-manifests:
-  rawYaml:
-  - k8s/*.yaml
+    useBuildkit: false
 deploy:
-  kubectl: {}
+  helm:
+    releases:
+      - name: akka-monitor
+        chartPath: helm/akka-monitor
+        namespace: monitoring
+        createNamespace: true
+        skipBuildDependencies: true
+        setValueTemplates:
+          akkaMonitor.image.repository: michalmarszalek/akka-monitor
+          akkaMonitor.image.tag: "{{.IMAGE_TAG}}"
+        valuesFiles:
+          - helm/akka-monitor/values.yaml

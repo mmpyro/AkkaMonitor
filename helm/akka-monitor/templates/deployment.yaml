@@ -1,0 +1,55 @@
+{{- if .Values.akkaMonitor.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "akka-monitor.fullname" . }}
+  namespace: {{ include "akka-monitor.namespace" . }}
+  labels:
+    {{- include "akka-monitor.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.akkaMonitor.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "akka-monitor.selectorLabels" . | nindent 6 }}
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        {{- include "akka-monitor.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - name: monitor
+        image: "{{ .Values.akkaMonitor.image.repository }}:{{ .Values.akkaMonitor.image.tag }}"
+        imagePullPolicy: {{ .Values.akkaMonitor.image.pullPolicy }}
+        env:
+        - name: ASPNETCORE_HTTP_PORTS
+          value: "{{ .Values.akkaMonitor.service.targetPort }}"
+        ports:
+        - containerPort: {{ .Values.akkaMonitor.service.targetPort }}
+          name: http
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        resources:
+          {{- toYaml .Values.akkaMonitor.resources | nindent 10 }}
+        volumeMounts:
+        - name: config
+          mountPath: "/home/app/appsettings.json"
+          subPath: appsettings.json
+          readOnly: true
+      volumes:
+      - name: config
+        configMap:
+          name: {{ include "akka-monitor.fullname" . }}-config
+{{- end }}

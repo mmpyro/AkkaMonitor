@@ -9,7 +9,8 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0
 ENV APP Monitor.dll
 WORKDIR /home/app
 COPY --from=builder /home/app/out .
-EXPOSE 80
+ENV ASPNETCORE_HTTP_PORTS=8080
+EXPOSE 8080
 EXPOSE 9110
 EXPOSE 4055
 ENTRYPOINT ["dotnet", "Monitor.dll"]

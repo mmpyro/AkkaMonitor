@@ -1,0 +1,260 @@
+# Default values for akka-monitor
+namespace: monitoring
+
+# AkkaMonitor application settings
+akkaMonitor:
+  enabled: true
+  replicaCount: 1
+
+  image:
+    repository: michalmarszalek/akka-monitor
+    tag: "1.3"
+    pullPolicy: IfNotPresent
+
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "260Mi"
+    limits:
+      cpu: "1000m"
+      memory: "1Gi"
+
+  service:
+    name: monitoring-service
+    type: ClusterIP
+    port: 8080
+    targetPort: 8080
+
+  ingress:
+    enabled: true
+    className: "nginx"
+    annotations: {}
+      # kubernetes.io/ingress.class: nginx
+      # kubernetes.io/tls-acme: "true"
+    hosts:
+      - host: akka-monitor.local
+        paths:
+          - path: /
+            pathType: Prefix
+    tls: []
+    #  - secretName: chart-example-tls
+    #    hosts:
+    #      - chart-example.local
+
+  # Application configuration
+  config:
+    monitors:
+      - type: "Http"
+        url: "https://google.com"
+        expectedStatusCode: 200
+        checkInterval: "10"
+      - type: "Http"
+        url: "https://wp.pl"
+        expectedStatusCode: 200
+        checkInterval: "10"
+      - type: "Http"
+        url: "https://onet.pl"
+        expectedStatusCode: 200
+        checkInterval: "10"
+      - type: "Http"
+        url: "https://helion.pl"
+        expectedStatusCode: 200
+        checkInterval: "10"
+      - type: "Http"
+        url: "https://jetbrains.com"
+        expectedStatusCode: 200
+        checkInterval: "10"
+      - type: "Http"
+        url: "https://flyrlabs.com"
+        expectedStatusCode: 200
+        checkInterval: "10"
+      - type: "Http"
+        url: "https://abb.com"
+        expectedStatusCode: 200
+        checkInterval: "10"
+      - type: "Http"
+        url: "https://ubs.com"
+        expectedStatusCode: 200
+        checkInterval: "10"
+      - type: "Http"
+        url: "https://interia.pl"
+        expectedStatusCode: 200
+        checkInterval: "10"
+      - type: "DNS"
+        hostname: "google.com"
+        checkInterval: "30"
+      - type: "DNS"
+        hostname: "wp.pl"
+        checkInterval: "30"
+      - type: "DNS"
+        hostname: "onet.pl"
+        checkInterval: "30"
+      - type: "DNS"
+        hostname: "helion.pl"
+        checkInterval: "30"
+      - type: "DNS"
+        hostname: "jetbrains.com"
+        checkInterval: "30"
+      - type: "DNS"
+        hostname: "flyrlabs.com"
+        checkInterval: "30"
+      - type: "DNS"
+        hostname: "abb.com"
+        checkInterval: "30"
+      - type: "DNS"
+        hostname: "ubs.com"
+        checkInterval: "30"
+      - type: "DNS"
+        hostname: "interia.pl"
+        checkInterval: "30"
+
+    alerts:
+      - type: "Slack"
+        slackChannel: "#akka"
+        slackUrl: "https://hooks.slack.com/services/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"
+
+  networkPolicy:
+    enabled: true
+    policyTypes:
+      - Ingress
+      - Egress
+    ingress:
+      # Allow traffic from Prometheus for metrics scraping
+      - from:
+          - podSelector:
+              matchLabels:
+                app.kubernetes.io/name: prometheus
+        ports:
+          - protocol: TCP
+            port: 8080
+      # Allow traffic from nginx ingress controller
+      - from:
+          - namespaceSelector:
+              matchLabels:
+                kubernetes.io/metadata.name: ingress-nginx
+            podSelector:
+              matchLabels:
+                app.kubernetes.io/name: ingress-nginx
+        ports:
+          - protocol: TCP
+            port: 8080
+    egress:
+      - {}
+
+# Grafana subchart configuration
+grafana:
+  enabled: true
+
+  adminPassword: admin
+
+  persistence:
+    enabled: true
+    size: 200Mi
+
+  # Additional persistence for logs
+  extraVolumes:
+    - name: grafana-log
+      persistentVolumeClaim:
+        claimName: grafana-log
+
+  extraVolumeMounts:
+    - name: grafana-log
+      mountPath: /var/log/grafana
+
+  resources:
+    requests:
+      memory: "250Mi"
+      cpu: "500m"
+    limits:
+      memory: "2Gi"
+      cpu: "1500m"
+
+  ingress:
+    enabled: true
+    hosts:
+      - akka-monitoring.com
+    path: /
+    pathType: Prefix
+
+  datasources:
+    datasources.yaml:
+      apiVersion: 1
+      datasources:
+        - name: Prometheus
+          type: prometheus
+          url: http://akka-monitor-kube-prometheus-stack-prometheus:9090
+          access: proxy
+          isDefault: true
+
+  networkPolicy:
+    enabled: true
+    egress:
+      enabled: true
+      ports:
+        - port: 9090
+          protocol: TCP
+
+# Prometheus Operator configuration
+prometheus:
+  enabled: true
+
+kube-prometheus-stack:
+  # Disable components we don't need
+  alertmanager:
+    enabled: false
+
+  grafana:
+    enabled: false # We use our own Grafana subchart
+
+  # Prometheus configuration
+  prometheus:
+    enabled: true
+
+    ingress:
+      enabled: true
+      hosts:
+        - akka-monitoring.prometheus.com
+      pathType: Prefix
+
+    prometheusSpec:
+      retention: 30d
+
+      resources:
+        requests:
+          memory: "150Mi"
+          cpu: "500m"
+        limits:
+          memory: "1Gi"
+          cpu: "1000m"
+
+      storageSpec:
+        volumeClaimTemplate:
+          spec:
+            accessModes: ["ReadWriteOnce"]
+            resources:
+              requests:
+                storage: 100Mi
+
+      # Service monitor selector to pick up our ServiceMonitor
+      serviceMonitorSelector:
+        matchLabels:
+          app: akka-monitor
+
+      # Additional scrape configs for self-monitoring
+      additionalScrapeConfigs:
+        - job_name: "prometheus"
+          static_configs:
+            - targets: ["localhost:9090"]
+
+  # Network policy for Prometheus
+  prometheus-node-exporter:
+    enabled: false
+
+  kubeStateMetrics:
+    enabled: false
+
+# ServiceMonitor for AkkaMonitor
+serviceMonitor:
+  enabled: true
+  interval: 15s
+  labels: {}
