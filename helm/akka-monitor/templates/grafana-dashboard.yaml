@@ -415,7 +415,7 @@ data:
           "pluginVersion": "8.6.2",
           "targets": [
             {
-              "expr": "rate(dotnet_gc_pause_seconds_sum[5m]) * 1000",
+              "expr": "rate(system_runtime_total_pause_time_by_gc_total[5m])",
               "refId": "A",
               "legendFormat": "GC Pause Time"
             }
@@ -492,12 +492,12 @@ data:
           "pluginVersion": "8.6.2",
           "targets": [
             {
-              "expr": "dotnet_threadpool_num_threads",
+              "expr": "system_runtime_threadpool_thread_count",
               "refId": "A",
               "legendFormat": "Thread Pool Threads"
             },
             {
-              "expr": "dotnet_threadpool_queue_length",
+              "expr": "system_runtime_threadpool_queue_length",
               "refId": "B",
               "legendFormat": "Thread Pool Queue Length"
             }
@@ -550,7 +550,7 @@ data:
                   }
                 ]
               },
-              "unit": "ops"
+              "unit": "short"
             },
             "overrides": []
           },
@@ -574,14 +574,14 @@ data:
           "pluginVersion": "8.6.2",
           "targets": [
             {
-              "expr": "rate(dotnet_jit_method_total[5m])",
+              "expr": "system_runtime_methods_jitted_count",
               "refId": "A",
-              "legendFormat": "JIT Methods/sec"
+              "legendFormat": "JIT Methods Count"
             },
             {
-              "expr": "rate(dotnet_jit_il_bytes[5m])",
+              "expr": "system_runtime_il_bytes_jitted",
               "refId": "B",
-              "legendFormat": "JIT IL Bytes/sec"
+              "legendFormat": "JIT IL Bytes"
             }
           ],
           "title": ".NET JIT Compilation",
@@ -656,7 +656,7 @@ data:
           "pluginVersion": "8.6.2",
           "targets": [
             {
-              "expr": "rate(dotnet_exceptions_total[5m])",
+              "expr": "rate(system_runtime_exception_count_total[5m])",
               "refId": "A",
               "legendFormat": "Exceptions/sec"
             }
@@ -733,7 +733,7 @@ data:
           "pluginVersion": "8.6.2",
           "targets": [
             {
-              "expr": "rate(dotnet_contention_total[5m])",
+              "expr": "rate(system_runtime_monitor_lock_contention_count_total[5m])",
               "refId": "A",
               "legendFormat": "Lock Contentions/sec"
             }
