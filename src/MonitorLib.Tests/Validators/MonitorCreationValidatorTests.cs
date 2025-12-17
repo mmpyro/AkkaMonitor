@@ -204,5 +204,53 @@ namespace MonitorLib.Tests.Validators
                 .WithMessage("*Invalid mode parameter*")
                 .WithMessage("*is not valid http status code*");
         }
+
+        [Theory]
+        [InlineData("https://wp.pl")]
+        [InlineData("http://example.com")]
+        [InlineData("name with spaces")]
+        [InlineData("name?query=value")]
+        [InlineData("name:colon")]
+        [InlineData("name/slash")]
+        public void Validate_NameNotUrlEncoded_ShouldThrowArgumentException(string name)
+        {
+            // Arrange
+            var message = new CreateHttpMonitorMessage(
+                name: name,
+                url: "https://google.com",
+                expectedStatusCode: 200,
+                interval: 60,
+                mode: MonitorMode.Poke
+            );
+
+            // Act & Assert
+            _validator.Invoking(v => v.Validate(message))
+                .Should().Throw<ArgumentException>()
+                .WithMessage("*is not URL-safe*");
+        }
+
+        [Theory]
+        [InlineData("simple-name")]
+        [InlineData("my_monitor")]
+        [InlineData("monitor123")]
+        [InlineData("MyMonitor")]
+        [InlineData("test.monitor")]
+        [InlineData("monitor~test")]
+        public void Validate_UrlSafeName_ShouldNotThrow(string name)
+        {
+            // Arrange
+            var message = new CreateHttpMonitorMessage(
+                name: name,
+                url: "https://google.com",
+                expectedStatusCode: 200,
+                interval: 60,
+                mode: MonitorMode.Poke
+            );
+
+            // Act & Assert
+            _validator.Invoking(v => v.Validate(message))
+                .Should().NotThrow();
+        }
     }
 }
+

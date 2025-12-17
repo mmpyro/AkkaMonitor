@@ -27,6 +27,7 @@ namespace Monitor
             services.AddTransient<IConfigurationParser, ConfigurationParser>();
             services.AddTransient<IActorFactory, ActorFactory>();
             services.AddTransient<IMonitorCreationValidator, MonitorCreationValidator>();
+            services.AddTransient<IAlertCreationValidator, AlertCreationValidator>();
 
             // creates an instance of the ISignalRProcessor that can be handled by SignalR
             services.AddSingleton<IMonitorController, AkkaService>();

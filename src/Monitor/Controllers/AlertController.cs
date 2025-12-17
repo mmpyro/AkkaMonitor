@@ -4,6 +4,8 @@ using Microsoft.Extensions.Logging;
 using Monitor;
 using MonitorLib.Dtos;
 using MonitorLib.Messages;
+using MonitorLib.Validators;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -15,11 +17,13 @@ namespace MonitorServer.Controllers
     {
         private readonly ILogger<AlertController> _logger;
         private readonly IMonitorController _monitorController;
+        private readonly IAlertCreationValidator _validator;
         private readonly IMapper _mapper;
 
-        public AlertController(IMonitorController monitorController, IMapper mapper, ILogger<AlertController> logger)
+        public AlertController(IMonitorController monitorController, IAlertCreationValidator validator, IMapper mapper, ILogger<AlertController> logger)
         {
             _monitorController = monitorController;
+            _validator = validator;
             _mapper = mapper;
             _logger = logger;
         }
@@ -58,10 +62,15 @@ namespace MonitorServer.Controllers
             try
             {
                 var msg = _mapper.Map<SlackAlert, CreateSlackAlertMessage>(data);
+                _validator.Validate(msg);
                 var res = await _monitorController.CreateAlert(msg);
                 if (res != null)
                     return Ok($"Alert {res.Name} created.");
                 return BadRequest($"Alert wasn't created for request {data}.");
+            }
+            catch(ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
             }
             catch(AutoMapperMappingException ex)
             {

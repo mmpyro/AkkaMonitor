@@ -41,6 +41,11 @@ namespace MonitorLib.Validators
                 MarkInvalid("Monitor name cannot be empty.");
             }
 
+            if (!IsEmpty(msg.Name) && !IsUrlEncoded(msg.Name))
+            {
+                MarkInvalid($"Monitor name '{msg.Name}' is not URL-safe. Please use a URL-encoded name or avoid special characters like ':', '/', '?', etc.");
+            }
+
             if (msg.Interval <= 0)
             {
                 MarkInvalid($"Interval has to be greater than 0, but was {msg.Interval} .");
@@ -86,6 +91,12 @@ namespace MonitorLib.Validators
         private bool IsEmpty(string value)
         {
             return string.IsNullOrEmpty(value) || string.IsNullOrWhiteSpace(value);
+        }
+
+        private bool IsUrlEncoded(string value)
+        {
+            // A name is URL-safe if encoding it returns the same value
+            return Uri.EscapeDataString(value) == value;
         }
     }
 }

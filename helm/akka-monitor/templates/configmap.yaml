@@ -35,7 +35,7 @@ data:
             {{- range $i, $alert := .Values.akkaMonitor.config.alerts }}
             {
                 "Type": {{ $alert.type | quote }},
-                "Name": {{ $alert.slackChannel | quote }},
+                "Name": {{ $alert.name | quote }},
                 "Channel": {{ $alert.slackChannel | quote }},
                 "Url": {{ $alert.slackUrl | quote }}
             }{{- if lt (add1 $i) $alertCount }},{{- end }}

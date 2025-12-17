@@ -46,10 +46,10 @@ namespace Monitor
                     {
                         case "Http":
                             int expectedStatusCode = int.Parse(monitor["ExpectedStatusCode"]);
-                            yield return new CreateHttpMonitorMessage(monitor["Name"], monitor["Url"], expectedStatusCode, CheckInterval(monitor["Interval"]), GetMode(monitor["Mode"]));
+                            yield return new CreateHttpMonitorMessage(Uri.EscapeDataString(monitor["Name"]), monitor["Url"], expectedStatusCode, CheckInterval(monitor["Interval"]), GetMode(monitor["Mode"]));
                             break;
                         case "DNS":
-                            yield return new CreateDnsMonitorMessage(monitor["Name"], monitor["Hostname"], CheckInterval(monitor["Interval"]), GetMode(monitor["Mode"]));
+                            yield return new CreateDnsMonitorMessage(Uri.EscapeDataString(monitor["Name"]), monitor["Hostname"], CheckInterval(monitor["Interval"]), GetMode(monitor["Mode"]));
                             break;
                         default:
                             break;
@@ -68,7 +68,7 @@ namespace Monitor
                     switch (alert["Type"])
                     {
                         case "Slack":
-                            yield return new CreateSlackAlertMessage(alert["Name"], alert["Url"], alert["Channel"]);
+                            yield return new CreateSlackAlertMessage(Uri.EscapeDataString(alert["Name"]), alert["Url"], alert["Channel"]);
                             break;
                         default:
                             break;

@@ -128,6 +128,7 @@ akkaMonitor:
 
     alerts:
       - type: "Slack"
+        name: "slack"
         slackChannel: "#akka"
         slackUrl: "https://hooks.slack.com/services/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"
 

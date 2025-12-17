@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -8,6 +9,7 @@ using Monitor;
 using MonitorLib.Dtos;
 using MonitorLib.Enums;
 using MonitorLib.Messages;
+using MonitorLib.Validators;
 using MonitorServer.Controllers;
 using Moq;
 using Xunit;
@@ -17,6 +19,7 @@ namespace Monitor.Tests.Controllers
     public class AlertControllerTests
     {
         private readonly Mock<IMonitorController> _monitorControllerMock;
+        private readonly Mock<IAlertCreationValidator> _validatorMock;
         private readonly Mock<ILogger<AlertController>> _loggerMock;
         private readonly IMapper _mapper;
         private readonly AlertController _controller;
@@ -24,6 +27,7 @@ namespace Monitor.Tests.Controllers
         public AlertControllerTests()
         {
             _monitorControllerMock = new Mock<IMonitorController>();
+            _validatorMock = new Mock<IAlertCreationValidator>();
             _loggerMock = new Mock<ILogger<AlertController>>();
 
             var config = new MapperConfiguration(cfg =>
@@ -34,6 +38,7 @@ namespace Monitor.Tests.Controllers
 
             _controller = new AlertController(
                 _monitorControllerMock.Object,
+                _validatorMock.Object,
                 _mapper,
                 _loggerMock.Object
             );
@@ -185,6 +190,30 @@ namespace Monitor.Tests.Controllers
             // The result depends on whether AutoMapper throws or creates a message with null URL
             // In most cases, it will proceed but might fail at the service level
             result.Should().NotBeNull();
+        }
+
+        [Fact]
+        public async Task CreateAlert_WithUrlUnsafeName_ShouldReturnBadRequest()
+        {
+            // Arrange
+            var slackAlert = new SlackAlert
+            {
+                Name = "https://wp.pl",  // URL-unsafe name
+                Url = "https://hooks.slack.com/services/XXX",
+                Channel = "#general"
+            };
+
+            _validatorMock
+                .Setup(x => x.Validate(It.IsAny<CreateAlertMessageReq>()))
+                .Throws(new ArgumentException("Alert name 'https://wp.pl' is not URL-safe."));
+
+            // Act
+            var result = await _controller.CreateAlert(slackAlert);
+
+            // Assert
+            result.Should().BeOfType<BadRequestObjectResult>();
+            var badRequestResult = result as BadRequestObjectResult;
+            badRequestResult.Value.Should().Be("Alert name 'https://wp.pl' is not URL-safe.");
         }
     }
 }
