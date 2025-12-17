@@ -1,6 +1,6 @@
 using System;
-using System.Collections.Specialized;
-using System.Net;
+using System.Collections.Generic;
+using System.Net.Http;
 using System.Text;
 using Newtonsoft.Json;
 
@@ -15,7 +15,7 @@ namespace MonitorLib.Clients
     public class SlackClient : ISlackClient
     {
         private readonly Uri _uri;
-        private readonly Encoding _encoding = new UTF8Encoding();
+        private static readonly HttpClient _httpClient = new HttpClient();
 
         public SlackClient(string urlWithAccessToken)
         {
@@ -37,13 +37,15 @@ namespace MonitorLib.Clients
         public void PostMessage(Payload payload)
         {
             var payloadJson = JsonConvert.SerializeObject(payload);
-            using (WebClient client = new WebClient())
+            var contentEntries = new List<KeyValuePair<string, string>>
             {
-                var data = new NameValueCollection();
-                data["payload"] = payloadJson;
+                new KeyValuePair<string, string>("payload", payloadJson)
+            };
 
-                var response = client.UploadValues(_uri, "POST", data);
-                var responseText = _encoding.GetString(response);
+            using (var content = new FormUrlEncodedContent(contentEntries))
+            {
+                var response = _httpClient.PostAsync(_uri, content).GetAwaiter().GetResult();
+                response.EnsureSuccessStatusCode();
             }
         }
     }
