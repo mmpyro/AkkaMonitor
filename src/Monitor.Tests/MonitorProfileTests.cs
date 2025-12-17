@@ -99,9 +99,9 @@ namespace Monitor.Tests
             // Arrange
             var parameters = new { Channel = "#general", Url = "https://hooks.slack.com/services/XXX" };
             var alertDetailsRes = new AlertDetailsMessageRes(
-                name: "TestAlert",
-                type: AlertType.Slack,
-                parameters: parameters
+                Name: "TestAlert",
+                Type: AlertType.Slack,
+                Parameters: parameters
             );
 
             // Act
@@ -119,12 +119,12 @@ namespace Monitor.Tests
         {
             // Arrange
             var monitorStatusRes = new MonitorStatusMessageRes(
-                name: "TestMonitor",
-                interval: 60,
-                identifier: "https://example.com",
-                type: MonitorType.Http,
-                mode: MonitorMode.Poke,
-                state: MonitorState.Success
+                Name: "TestMonitor",
+                Interval: 60,
+                Identifier: "https://example.com",
+                Type: MonitorType.Http,
+                Mode: MonitorMode.Poke,
+                State: MonitorState.Success
             );
 
             // Act

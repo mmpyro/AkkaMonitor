@@ -71,12 +71,12 @@ namespace Monitor.Tests.Controllers
             // Arrange
             var monitorName = "TestMonitor";
             var expectedStatus = new MonitorStatusMessageRes(
-                name: monitorName,
-                interval: 60,
-                identifier: "https://example.com",
-                type: MonitorType.Http,
-                mode: MonitorMode.Poke,
-                state: MonitorState.Success
+                Name: monitorName,
+                Interval: 60,
+                Identifier: "https://example.com",
+                Type: MonitorType.Http,
+                Mode: MonitorMode.Poke,
+                State: MonitorState.Success
             );
 
             _monitorControllerMock

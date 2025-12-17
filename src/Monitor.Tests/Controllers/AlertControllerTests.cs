@@ -73,9 +73,9 @@ namespace Monitor.Tests.Controllers
             var alertName = "TestAlert";
             var parameters = new { Channel = "#general", Url = "https://hooks.slack.com/services/XXX" };
             var expectedDetails = new AlertDetailsMessageRes(
-                name: alertName,
-                type: AlertType.Slack,
-                parameters: parameters
+                Name: alertName,
+                Type: AlertType.Slack,
+                Parameters: parameters
             );
 
             _monitorControllerMock

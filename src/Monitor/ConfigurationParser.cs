@@ -4,6 +4,7 @@ using MonitorLib;
 using MonitorLib.Enums;
 using MonitorLib.Messages;
 using System;
+using MonitorLib.Validators;
 using System.Collections.Generic;
 
 namespace Monitor
@@ -46,10 +47,14 @@ namespace Monitor
                     {
                         case "Http":
                             int expectedStatusCode = int.Parse(monitor["ExpectedStatusCode"]);
-                            yield return new CreateHttpMonitorMessage(Uri.EscapeDataString(monitor["Name"]), monitor["Url"], expectedStatusCode, CheckInterval(monitor["Interval"]), GetMode(monitor["Mode"]));
+                            var httpMonitor = new CreateHttpMonitorMessage(monitor["Name"], monitor["Url"], expectedStatusCode, CheckInterval(monitor["Interval"]), GetMode(monitor["Mode"]));
+                            new MonitorCreationValidator().Validate(httpMonitor);
+                            yield return httpMonitor;
                             break;
                         case "DNS":
-                            yield return new CreateDnsMonitorMessage(Uri.EscapeDataString(monitor["Name"]), monitor["Hostname"], CheckInterval(monitor["Interval"]), GetMode(monitor["Mode"]));
+                            var dnsMonitor = new CreateDnsMonitorMessage(monitor["Name"], monitor["Hostname"], CheckInterval(monitor["Interval"]), GetMode(monitor["Mode"]));
+                            new MonitorCreationValidator().Validate(dnsMonitor);
+                            yield return dnsMonitor;
                             break;
                         default:
                             break;
@@ -68,7 +73,9 @@ namespace Monitor
                     switch (alert["Type"])
                     {
                         case "Slack":
-                            yield return new CreateSlackAlertMessage(Uri.EscapeDataString(alert["Name"]), alert["Url"], alert["Channel"]);
+                            var slackAlert = new CreateSlackAlertMessage(alert["Name"], alert["Url"], alert["Channel"]);
+                            new AlertCreationValidator().Validate(slackAlert);
+                            yield return slackAlert;
                             break;
                         default:
                             break;

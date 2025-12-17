@@ -3,6 +3,7 @@ WORKDIR /home/app
 ENV APP Monitor
 COPY . .
 RUN mkdir -p $APP/Config && echo "{\"Monitors\": [], \"Alerts\": []}" > $APP/Config/appsettings.json
+RUN dotnet test
 RUN dotnet publish -c Release -o out
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
