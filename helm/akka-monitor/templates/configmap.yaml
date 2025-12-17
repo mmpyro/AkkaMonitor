@@ -15,7 +15,7 @@ data:
             {
                 {{- if eq $monitor.type "Http" }}
                 "Type": "Http",
-                "Name": {{ $monitor.url | quote }},
+                "Name": {{ $monitor.name | quote }},
                 "Url": {{ $monitor.url | quote }},
                 "ExpectedStatusCode": {{ $monitor.expectedStatusCode }},
                 "Interval": {{ $monitor.checkInterval | quote }},
